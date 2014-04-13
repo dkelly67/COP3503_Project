@@ -4,14 +4,14 @@
 #include "Multiplication.h"
 
 //Constructor, initializes "Numbers" array, called "terms"
-Multiplication::Multiplication(Number* terms)
+Multiplication::Multiplication(Number** multiplication, int size)
 {
-	numOfTerms = sizeof(terms);
+	this->numOfTerms = size;
 
-	for (int i = 0; i < numOfTerms; i++)
-	{
-		this->terms[i] = terms[i];
-	}
+	this->terms = new Number * [this->numOfTerms];
+
+	terms = multiplication;
+
 }
 
 //Default destructor
@@ -19,7 +19,7 @@ Multiplication :: ~Multiplication(){}
 
 
 //Return array of Numbers being multiplied.
-Number* Multiplication::getTerms()
+Number** Multiplication::getTerms()
 {
 	return this->terms;
 }
@@ -30,7 +30,7 @@ double Multiplication::getDecimal()
 	double ans = 1;
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		ans = ans*terms[i].getDecimal();
+		ans = ans*terms[i]->getDecimal();
 	}
 
 	return ans;
@@ -44,7 +44,7 @@ string Multiplication::getString()
 	string numberString;
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		num = this->terms[i].getString();
+		num = this->terms[i]->getString();
 		if (i == 0)
 			numberString = num;
 		else
@@ -57,17 +57,27 @@ string Multiplication::getString()
 //Calls calculate on each object type within terms, then multiplies the Numbers together to provide symbolic calculation
 Number* Multiplication::calculate()
 {
-	string type;
-	Number* ans = NULL;
+
+	Number* total = NULL;
+	Number* one = NULL;
+	Number* two = NULL;
+	Number *ans;
+	int mult = 1;
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		ans = this->terms[i].calculate();
+		one = this->terms[i];
+	
+		if (typeid(*one) == typeid(Integer))
+		{
+				Integer* intOne = (Integer *)one;
+				mult *= intOne->getInteger();
 
-
-		//IMPLEMENT WAY TO SYMBOLICALLY MULTIPLY VALUES.
+				total = new Integer(mult);
+		}
 
 	}
-
-	return ans;
+		return total;
+	
 }
+
 

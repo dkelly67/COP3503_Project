@@ -2,16 +2,13 @@
 
 #include "Summation.h"
 
-
 //Constructor, initializes "Numbers" array, called "terms"
-Summation::Summation(Number *terms)
+Summation::Summation(Number ** summation, int size)
 {
-	int numOfTerms = sizeof(terms);
+	this->numOfTerms = size;
+	this->terms = new Number* [this->numOfTerms];
 
-	for (int i = 0; i < numOfTerms; i++)
-	{
-		this->terms[i] = terms[i];
-	}
+	terms = summation;
 }
 
 //Default destructor
@@ -19,7 +16,7 @@ Summation :: ~Summation(){}
 
 
 //Return array of Numbers being added.
-Number* Summation::getTerms()
+Number** Summation::getTerms()
 {
 	return this->terms;
 }
@@ -28,9 +25,11 @@ Number* Summation::getTerms()
 double Summation::getDecimal()
 {
 	double ans = 0;
+
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		ans = ans + terms[i].getDecimal();
+		
+		ans = ans + terms[i]->getDecimal();
 	}
 
 	return ans;
@@ -44,7 +43,7 @@ string Summation::getString()
 	string numberString;
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		num = this->terms[i].getString();
+		num = this->terms[i]->getString();
 		if (i == 0)
 			numberString = num;
 		else
@@ -53,19 +52,38 @@ string Summation::getString()
 	return numberString;
 }
 
+/*bool equals(Number* number)
+{
+	if (typeid) == typeid(*number))
+	{
+
+	}
+}*/
 //Calls calculate on each object type within terms, then multiplies the Numbers together to provide symbolic calculation
 Number* Summation::calculate()
 {
-	string type;
-	Number* ans = NULL;
+	Number* total = NULL;
+	Number* one = NULL;
+	Number* two = NULL;
+	int sum = 0;
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		ans = this->terms[i].calculate();
 
+		one = this->terms[i];
 
-		//IMPLEMENT WAY TO SYMBOLICALLY ADD VALUES
+		if (typeid(*one) == typeid(Integer))
+		{
+			Integer * intOne = (Integer *)one;
+
+			sum += intOne->getInteger();
+
+			total = new Integer(sum);
+		}
+
+		
+		
 	}
 
-	return ans;
+	return total;
 }
 

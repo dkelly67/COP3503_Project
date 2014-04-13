@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include "Integer.h"
 
 class Summation : public Number
 {
@@ -15,21 +16,21 @@ class Summation : public Number
 public:
 
 	//Constructor: Creates Multiplication object based on an array of Number objects
-	Summation(Number *terms);
+	Summation(Number **terms, int size);
 
 	//Destructor
 	~Summation();
 
 
 	//Functions
-	Number* getTerms(); //Returns the Number array being summed
+	Number** getTerms(); //Returns the Number array being summed
 	double getDecimal(); //Returns decimal form
 	string getString(); //Returns string of summing terms
 	Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
-
+	//bool equals(Number * number);
 private: //data fields
 
-	Number* terms; //Pointer to an array of Numbers, called terms
+	Number** terms; //Pointer to an array of Numbers, called terms
 	int numOfTerms; //Number of terms in summmation
 };
 
