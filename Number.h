@@ -1,9 +1,9 @@
 /*
- * Number.h
- *
- *  Created on: Apr 6, 2014
- *      Author: Jackson
- */
+* Number.h
+*
+*  Created on: Apr 6, 2014
+*      Author: Jackson
+*/
 
 #ifndef NUMBER_H_
 #define NUMBER_H_
@@ -14,8 +14,8 @@ using namespace std;
 
 class Number {
 public:
-	Number();
-	virtual ~Number();
+//	Number();
+//	virtual ~Number();
 
 	virtual Number* calculate() = 0;
 	virtual string getString() = 0;
