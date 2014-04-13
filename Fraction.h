@@ -9,6 +9,7 @@
 #define FRACTION_H_
 
 #include "Number.h"
+#include "Integer.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ public:
 	virtual Number* calculate();
 	virtual string getString();
 	virtual double getDecimal();
+	virtual bool equals(Number* number);
 
 	Number* getNumerator();
 	Number* getDenominator();
@@ -29,6 +31,8 @@ public:
 private:
 	Number* num;
 	Number* den;
+
+	void reduceInts(Integer& n, Integer& d);
 
 
 };

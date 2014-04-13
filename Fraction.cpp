@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Fraction.h"
 #include "Integer.h"
+#include "Constant.h"
 #include <vector>
 
 using namespace std;
@@ -17,13 +18,42 @@ Fraction::Fraction(Number* num, Number* den){
 
 Number* Fraction::calculate(){
 
+	if(num->equals(den))
+		return new Integer(1);
 
-	Integer* n = (Integer*) num;
-	Integer* d = (Integer*) den;
 
-	vector<int> nFactors = n->getFactors();
+	//Multiplicaion
+	//Rationalize denominator
+	//Reduce Summation
 
-	vector<int> dFactors = d->getFactors();
+
+
+	if(typeid(*num) == typeid(Integer) && typeid(*den) == typeid(Integer)){
+
+		//Reduce integers
+
+		Integer* n = (Integer*) num;
+		Integer* d = (Integer*) den;
+
+		reduceInts(*n, *d);
+
+		//delete this;
+
+		if(d->getInteger() != 1)
+			return new Fraction(n, d);
+		else return new Integer(d->getInteger());
+	}
+
+
+	return this;
+}
+
+
+void Fraction::reduceInts(Integer& n, Integer& d){
+
+	vector<int> nFactors = n.getFactors();
+
+	vector<int> dFactors = d.getFactors();
 
 	//TODO: Really hacky way of doing this
 
@@ -35,7 +65,6 @@ Number* Fraction::calculate(){
 				dFactors[j] = 4;
 			}
 		}
-
 	}
 
 	int numValue = 1;
@@ -52,10 +81,11 @@ Number* Fraction::calculate(){
 		denValue *= dFactors[i];
 	}
 
-	if(denValue != 1)
-		return new Fraction(new Integer(numValue), new Integer(denValue));
-	else return new Integer(numValue);
+	n = Integer(numValue);
+	d = Integer(denValue);
+
 }
+
 
 
 
@@ -76,11 +106,44 @@ double Fraction::getDecimal(){
 string Fraction::getString(){
 	ostringstream stream;
 
-	//TODO: Check if parenthesis are nessasary
 
-	stream << "(" << num->getString() << ")" <<  "/" << "(" << den->getString() << ")";
+	string s = typeid(*num).name();
+	string s1 = typeid(*den).name();
+
+	if((s != typeid(Integer).name()) && s != typeid(Constant).name())
+		stream << "(";
+
+	stream << num->getString();
+
+	if((s != typeid(Integer).name()) && s != typeid(Constant).name())
+			stream << ")";
+
+	stream << "/";
+
+	if((s1 != typeid(Integer).name()) && s1 != typeid(Constant).name())
+			stream << "(";
+
+	stream << den->getString();
+
+	if((s1 != typeid(Integer).name()) && s1 != typeid(Constant).name())
+				stream << ")";
 
 	return stream.str();
+}
+
+
+bool Fraction::equals(Number* number){
+	if(typeid(*number) != typeid(Fraction))
+		return false;
+	Fraction* f = (Fraction*)number;
+
+	Number* num1 = this->num;
+	Number* num2 = f->num;
+	Number* den1 = this->den;
+	Number* den2 = f->den;
+
+	return num1->equals(num2) && den1->equals(den2);
+
 }
 
 

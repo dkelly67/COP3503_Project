@@ -19,6 +19,9 @@ public:
 	virtual Number* calculate() = 0;
 	virtual string getString() = 0;
 	virtual double getDecimal() = 0;
+
+	virtual bool equals(Number* number) = 0;
+
 };
 
 

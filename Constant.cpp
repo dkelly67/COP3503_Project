@@ -9,6 +9,8 @@
 
 #include <stdexcept>
 
+#include <typeinfo>
+
 using namespace std;
 
 
@@ -52,6 +54,15 @@ double Constant::getDecimal(){
 		throw out_of_range("Constant must be either e or pi");
 }
 
+
+bool Constant::equals(Number* number){
+	if(typeid(*number) != typeid(Constant))
+		return false;
+
+	Constant* c = (Constant*) number;
+
+	return (this->pi == c->pi && this->e == c->e);
+}
 
 Constant::~Constant() {
 }

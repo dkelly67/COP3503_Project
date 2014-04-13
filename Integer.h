@@ -21,6 +21,7 @@ public:
 	virtual Number* calculate();
 	virtual string getString();
 	virtual double getDecimal();
+	bool equals(Number* number);
 
 	int getInteger();
 	vector<int> getFactors();
@@ -32,9 +33,5 @@ private:
 
 	void getFactors(int theInt, vector<int>*);
 };
-
-
-
-
 
 #endif /* INTEGER_H_ */

@@ -8,6 +8,7 @@
 #include "Integer.h"
 #include <sstream>
 #include <iostream>
+#include <typeinfo>
 
 using namespace std;
 
@@ -74,6 +75,15 @@ double Integer::getDecimal(){
 	return theInteger;
 }
 
+bool Integer::equals(Number* number){
+	if(typeid(*number) != typeid(Integer))
+		return false;
+
+	Integer* i = (Integer*) number;
+
+	return (this->getInteger() == i->getInteger());
+
+}
 
 
 Integer::~Integer() {

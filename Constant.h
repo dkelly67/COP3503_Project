@@ -20,7 +20,7 @@ public:
 	virtual Number* calculate();
 	virtual string getString();
 	virtual double getDecimal();
-
+	virtual bool equals(Number* number);
 
 	bool IsPi();
 	bool IsE();
