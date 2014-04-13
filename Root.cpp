@@ -7,9 +7,10 @@
 
 #include "Root.h"
 #include "Integer.h"
-#include "Multipication.h"
+#include "Multiplication.h"
+#include "Number.h"
 
-#include <math.h> // For pow()
+#include <math.h> // For power()
 #include <vector>
 #include <sstream>
 #include <stdexcept> // For throwing out_of_range exceptions
@@ -47,7 +48,7 @@ Number* Root::calculate() {
 	if (insideType == "class Integer") {
 
 		Integer* i = (Integer*) inside; // Cast inside to actually be an integer
-		vector<int> v = getFactors(i, v); // Creating a new vector v and then using it in getFactors()
+		vector<int> v = i->getFactors(); // Creating a new vector v and then using it in getFactors()
 
 		sort(v.begin(), v.end()); // Arranging the elements of vector v in ascending numerical order
 
@@ -71,15 +72,17 @@ Number* Root::calculate() {
 
 		// inside = (inside) / (outside)^root;
 		int answer = 1;
-		for (unsigned int i = 0; i < root ; i++ ) {
+		for (int i = 0; i < root ; i++ ) {
 			answer *= outside;
 		}
 
-		Root* r = new Root(root,new Integer (i->getInteger()/answer));
+		Root* r = new Root(new Integer (i->getInteger()/answer), root);
 
-		Number** terms = {new Integer(outside), r};
+		Number** terms = new Number*[2];
+		terms[0] = new Integer(outside);
+		terms[1] = r;
 
-		return new Multipication(terms);
+		return new Multiplication(terms, 2);
 	}
 
 	/////////////////////////////////////////////////////////
@@ -119,6 +122,11 @@ string Root::getString() {
 double Root::getDecimal() {
 	return pow(inside->getDecimal(), (1.0/root));
 }
+
+bool Root::equals(Number* number){
+	return false;
+}
+
 
 Root::~Root() {
 }

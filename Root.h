@@ -21,6 +21,7 @@ public:
 	virtual Number* calculate();
 	virtual string getString();
 	virtual double getDecimal();
+	virtual bool equals(Number* number);
 
 	// Class functions
 	Number* getInside();
