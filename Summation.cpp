@@ -52,38 +52,55 @@ string Summation::getString()
 	return numberString;
 }
 
-/*bool equals(Number* number)
+bool Summation::equals(Number* number)
 {
-	if (typeid) == typeid(*number))
-	{
-
-	}
-}*/
+	return false;
+}
 //Calls calculate on each object type within terms, then multiplies the Numbers together to provide symbolic calculation
 Number* Summation::calculate()
 {
+	Number* intTotal = new Integer(0);
 	Number* total = NULL;
-	Number* one = NULL;
-	Number* two = NULL;
+	Number* term = NULL;
 	int sum = 0;
+	int numeratorSum = 0;
+	int denomSum = 1;
+
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
 
-		one = this->terms[i];
+		term = this->terms[i];
 
-		if (typeid(*one) == typeid(Integer))
+		if (typeid(*term) == typeid(Integer))
 		{
-			Integer * intOne = (Integer *)one;
+			Integer * intNum = (Integer *)term;
 
-			sum += intOne->getInteger();
+			sum += intNum->getInteger();
 
-			total = new Integer(sum);
+			intTotal = new Integer(sum);
 		}
 
-		
-		
-	}
+		if (typeid(*term) == typeid(Fraction))
+		{
+			Fraction *fract = (Fraction *)term;
+			Number *num = fract->getNumerator();
+			Number *den = fract->getDenominator();
+				
+			if (typeid(*num) == typeid(*den) && typeid(Integer) == typeid(*num))
+			{
+				numeratorSum = numeratorSum*((Integer*)den)->getInteger() + ((Integer*)num)->getInteger()*denomSum;
 
-	return total;
+				denomSum *= ((Integer *)den)->getInteger();
+			}
+			
+		}
+
+	}
+	
+	
+		numeratorSum = ((Integer *)intTotal)->getInteger()*denomSum + numeratorSum;
+		total = new Fraction(new Integer(numeratorSum), new Integer(denomSum));
+	
+	return total->calculate();
 }
 

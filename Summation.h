@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include "Integer.h"
-
+#include "Fraction.h"
 class Summation : public Number
 {
 
@@ -27,7 +27,7 @@ public:
 	double getDecimal(); //Returns decimal form
 	string getString(); //Returns string of summing terms
 	Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
-	//bool equals(Number * number);
+	bool equals(Number* number);
 private: //data fields
 
 	Number** terms; //Pointer to an array of Numbers, called terms
