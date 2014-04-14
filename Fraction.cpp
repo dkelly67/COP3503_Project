@@ -18,6 +18,7 @@ using namespace std;
 Fraction::Fraction(Number* num, Number* den){
 	this->num = num;
 	this->den = den;
+	
 }
 
 
@@ -29,10 +30,8 @@ Number* Fraction::calculate(){
 
 	num = num->calculate();
 	den = den->calculate();
-
-
-
-	if(typeid(num) == typeid(Integer)){
+	
+	if(typeid(*num) == typeid(Integer)){
 		if(((Integer*)num)->getInteger() == 0)
 			return new Integer(0);
 	}
@@ -56,8 +55,8 @@ Number* Fraction::calculate(){
 		Summation* s = (Summation*)den;
 		if(s->getSize() == 2){
 			Number** terms = s->getTerms();
-			Number* root;
-			Number* nonRoot;
+			Number* root = NULL;
+			Number* nonRoot = NULL;
 
 			if(typeid(*terms[0]) == typeid(Root)){
 				root = new Multiplication(terms[0], new Integer(-1));
