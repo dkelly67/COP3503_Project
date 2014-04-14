@@ -10,6 +10,7 @@
 #include "Multiplication.h"
 #include "Root.h"
 #include "Exponent.h"
+#include "Summation.h"
 
 using namespace std;
 
@@ -42,7 +43,54 @@ Number* Fraction::calculate(){
 		den = r->getInside();
 
 		return calculate();
+	}
 
+	if(typeid(*den) == typeid(Summation)){
+		Summation* s = (Summation*)den;
+		if(s->getSize() == 2){
+			Number** terms = s->getTerms();
+			Number* root;
+			Number* nonRoot;
+
+			if(typeid(*terms[0]) == typeid(Root)){
+				root = new Multiplication(terms[0], new Integer(-1));
+				nonRoot = terms[1];
+			}
+
+			if(typeid(*terms[1]) == typeid(Root)){
+				root = new Multiplication(terms[1], new Integer(-1));
+				nonRoot = terms[0];
+			}
+
+			if(typeid(*terms[0]) == typeid(Multiplication)){
+				Multiplication* mult = (Multiplication*) terms[0];
+				for(int i = 0; i < mult->getSize(); i++)
+					if(typeid(*mult->getTerms()[i]) == typeid(Root)){
+						root = new Multiplication(mult, new Integer(-1));
+						nonRoot = terms[1];
+					}
+			}
+
+			if(typeid(*terms[1]) == typeid(Multiplication)){
+				Multiplication* mult = (Multiplication*) terms[1];
+				for(int i = 0; i < mult->getSize(); i++)
+					if(typeid(*mult->getTerms()[i]) == typeid(Root)){
+						root = new Multiplication(mult, new Integer(-1));
+						nonRoot = terms[0];
+					}
+			}
+
+			if(root != NULL){
+				Number** theTerms = new Number*[2];
+				theTerms[0] = root;
+				theTerms[1] = nonRoot;
+				Summation* conjucate = new Summation(theTerms, 2);
+				Multiplication* n = new Multiplication(num, conjucate);
+				Multiplication* d = new Multiplication(den, conjucate);
+				Fraction* f = new Fraction(n,d);
+				return f->calculate();
+			}
+		}
 	}
 
 
@@ -59,9 +107,6 @@ Number* Fraction::calculate(){
 
 		denTerms[0] = den;
 		denTerms[1] = f->getDenominator();
-
-		delete num;
-		delete den;
 
 		num = new Multiplication(numTerms, 2);
 		den = new Multiplication(denTerms, 2);
@@ -80,9 +125,6 @@ Number* Fraction::calculate(){
 
 		denTerms[0] = den;
 		denTerms[1] = f->getDenominator();
-
-		delete num;
-		delete den;
 
 		num = new Multiplication(numTerms, 2);
 		den = new Multiplication(denTerms, 2);
