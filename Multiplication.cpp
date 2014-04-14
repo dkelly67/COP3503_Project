@@ -16,6 +16,13 @@ Multiplication::Multiplication(Number** multiplication, int size) {
 	terms = multiplication;
 }
 
+Multiplication::Multiplication(Number* num1, Number* num2) {
+	this->numOfTerms = 2;
+	terms = new Number*[2];
+	terms[0] = num1;
+	terms[1] = num2;
+}
+
 // Return array of Numbers being multiplied.
 Number** Multiplication::getTerms() {
 	return this->terms;
@@ -86,6 +93,21 @@ Number* Multiplication::calculate() {
 				denomProduct *= ((Integer *)den)->getInteger();
 			}
 		}
+
+		if(typeid(*term) == typeid(Multiplication)){
+			Multiplication* mult = (Multiplication*) term;
+
+			Number** newTerms = new Number*[this->numOfTerms + mult->numOfTerms];
+
+			for(int i = 0; i < numOfTerms; i++)
+				newTerms[i] = terms[i];
+			for(int i = numOfTerms; i < numOfTerms + mult->numOfTerms; i++)
+				newTerms[i] = mult->getTerms()[i-numOfTerms];
+
+			Multiplication* ans = new Multiplication(newTerms, numOfTerms + mult->numOfTerms);
+
+			return ans->calculate();
+		}
 	}
 
 	numeratorProduct = ((Integer *)intTotal)->getInteger()*numeratorProduct;
@@ -93,6 +115,14 @@ Number* Multiplication::calculate() {
 
 	return total->calculate();
 }
+
+
+
+int Multiplication::getSize(){
+	return numOfTerms;
+}
+
+
 
 Multiplication :: ~Multiplication(){
 }

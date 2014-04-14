@@ -10,6 +10,7 @@
 
 #include "Number.h"
 #include "Integer.h"
+#include "Fraction.h"
 
 #include <typeinfo>
 #include <sstream>
@@ -20,6 +21,7 @@ class Multiplication : public Number {
 public:
 	// Creates Multiplication object based on an array of Number objects
 	Multiplication(Number **terms, int size);
+	Multiplication(Number* num1, Number* num2);
 
 	// Destructor
 	~Multiplication();
@@ -33,6 +35,7 @@ public:
 
 	// Class functions
 	Number** getTerms(); // Returns the Number array being multiplied
+	int getSize();
 
 private:
 	// Private Variables
