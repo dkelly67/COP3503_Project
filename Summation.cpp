@@ -7,7 +7,6 @@ Summation::Summation(Number ** summation, int size)
 {
 	this->numOfTerms = size;
 	this->terms = new Number* [this->numOfTerms];
-
 	terms = summation;
 }
 
@@ -21,6 +20,10 @@ Number** Summation::getTerms()
 	return this->terms;
 }
 
+int Summation::getSize()
+{
+	return this->numOfTerms;
+}
 //Output pure sum of entries inside 'terms'
 double Summation::getDecimal()
 {
@@ -41,13 +44,21 @@ string Summation::getString()
 	string type;
 	string num;
 	string numberString;
+	bool isZero = false;
+
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
+		
 		num = this->terms[i]->getString();
-		if (i == 0)
-			numberString = num;
+		if (this->terms[i]->getString() == "0"){
+			isZero = true;
+			continue;
+		}
+		if (isZero)
+			numberString = numberString + num;
 		else
-			numberString = numberString + " + " + num;
+			numberString = num + " + " + numberString;
+		isZero = false;
 	}
 	return numberString;
 }
@@ -59,48 +70,43 @@ bool Summation::equals(Number* number)
 //Calls calculate on each object type within terms, then multiplies the Numbers together to provide symbolic calculation
 Number* Summation::calculate()
 {
-	Number* intTotal = new Integer(0);
-	Number* total = NULL;
-	Number* term = NULL;
-	int sum = 0;
-	int numeratorSum = 0;
-	int denomSum = 1;
-
+	Number* sum = NULL;
+	Number* intTotal;
+	
+	if (numOfTerms == 1)
+		return this->terms[0];
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
 
-		term = this->terms[i];
-
-		if (typeid(*term) == typeid(Integer))
+		for (int j = i + 1; j < this->numOfTerms; j++)
 		{
-			Integer * intNum = (Integer *)term;
-
-			sum += intNum->getInteger();
-
-			intTotal = new Integer(sum);
-		}
-
-		if (typeid(*term) == typeid(Fraction))
-		{
-			Fraction *fract = (Fraction *)term;
-			Number *num = fract->getNumerator();
-			Number *den = fract->getDenominator();
-				
-			if (typeid(*num) == typeid(*den) && typeid(Integer) == typeid(*num))
+			if (typeid(*this->terms[i]) == typeid(*this->terms[j]) &&  typeid(*this->terms[i]) == typeid(Integer))
 			{
-				numeratorSum = numeratorSum*((Integer*)den)->getInteger() + ((Integer*)num)->getInteger()*denomSum;
-
-				denomSum *= ((Integer *)den)->getInteger();
+				sum = new Integer(((Integer*)terms[i])->getInteger() + ((Integer*)terms[j])->getInteger());
+				Number** add = new Number*[numOfTerms - 1];
+				add[0] = sum;
+				int l = 1;
+				for (int k = 0; k < this->numOfTerms; k++)
+				{
+					if (k != i && k != j){
+						add[l] = terms[k];
+						l++;
+					}
+				}
+				intTotal = new Summation(add, numOfTerms - 1);
+				return intTotal->calculate();
 			}
-			
+
+			if (typeid(*this->terms[i]) == typeid(*this->terms[j]) && typeid(*this->terms[i]) == typeid(Integer))
+			{
+
+			}
 		}
+		
+		
 
 	}
-	
-	
-		numeratorSum = ((Integer *)intTotal)->getInteger()*denomSum + numeratorSum;
-		total = new Fraction(new Integer(numeratorSum), new Integer(denomSum));
-	
-	return total->calculate();
+
+	return this;
 }
 
