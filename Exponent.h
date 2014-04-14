@@ -1,10 +1,3 @@
-/*
- * Exponent.h
- *
- *  Created on: Apr 13, 2014
- *      Author: Jackson
- */
-
 #ifndef EXPONENT_H_
 #define EXPONENT_H_
 
@@ -28,10 +21,8 @@ public:
 	virtual ~Exponent();
 
 private:
-
 	Number* inside;
 	Number* power;
 };
 
-
-#endif
+#endif /* EXPONENT_H_ */

@@ -1,5 +1,4 @@
 //============================================================================
-// Author      : Ross Castillo
 // Created on  : 04.12.14
 // File        : Logarithm.h
 // Description : This class will represent the log function of a calculator.
@@ -7,7 +6,9 @@
 
 #ifndef LOGARITHM_H_
 #define LOGARITHM_H_
+
 #include "Number.h"
+
 using namespace std;
 
 class Logarithm : public Number {

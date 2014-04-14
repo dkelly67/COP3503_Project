@@ -1,23 +1,16 @@
-/*
- * Exponent.cpp
- *
- *  Created on: Apr 13, 2014
- *      Author: Jackson
- */
-
-#include "Exponent.h"
-#include <sstream>
-#include <typeinfo>
+#include "Root.h"
 #include "Integer.h"
 #include "Fraction.h"
 #include "Constant.h"
-#include <iostream>
-#include "Multiplication.h"
-#include "Root.h"
+#include "Exponent.h"
 #include "Summation.h"
-#include <math.h>
+#include "Multiplication.h"
 
-using namespace std;
+#include <math.h>
+#include <sstream>
+#include <iostream>
+#include <typeinfo>
+
 
 Exponent::Exponent(Number* inside, Number* power){
 	this->inside = inside;
@@ -201,5 +194,3 @@ Exponent::~Exponent(){
 	delete inside;
 	delete power;
 }
-
-

@@ -1,23 +1,20 @@
 //============================================================================
-// Author      : Ross Castillo
 // Created on  : 04.13.14
 // File        : Root.h
 // Description : This class will represent the square root function.
 //============================================================================
 
 #include "Root.h"
-#include "Integer.h"
-#include "Multiplication.h"
 #include "Number.h"
+#include "Integer.h"
+#include "Exponent.h"
+#include "Multiplication.h"
 
-#include <math.h> // For power()
 #include <vector>
 #include <sstream>
-#include <stdexcept> // For throwing out_of_range exceptions
-#include <algorithm> // For sort()
-#include <iostream>
-
-using namespace std;
+#include <stdexcept>
+#include <algorithm> // sort()
+#include <math.h> // pow() for getDecimal()
 
 Root::Root(Number* inside, int root) {
 	this->inside = inside;
@@ -34,35 +31,61 @@ int Root::getRoot() {
 
 Number* Root::calculate() {
 
+	// Calculate the inside first before anything
+	inside = inside->calculate();
 
+
+	// Necessary checks
 	if (inside < 0) {
 		throw out_of_range("The inside of a square root must be positive");
 	}
+	if (root < 0) {
+		// Make an integer of 1 for the numerator
+		Integer* newNum = new Integer(1);
 
-	if (root < 0) { // If negative root, change to one over its positive root
+		// Make the negative root positive
+		root = root * (-1); // Possible because root is of type int
 
+		// Making a new root with the now positive 'root'
+		Root* negRt = new Root(inside, root);
+
+		// Make a fraction with 1 over the positive square root
+		Fraction* negRoot = new Fraction(newNum,negRt);
+
+		negRoot->calculate();
+
+		return negRoot;
 	}
 	else if (root == 1) { // If root is one, return inside as is
 		return inside;
 	}
 
 
-	if (typeid(*inside) == typeid(Integer)) {
+	string insideType = typeid(inside).name();
+	//////////////////////////////////////////////////////////////////////////
+	if (insideType == "class Integer") {
 
-		Integer* i = (Integer*) inside; // Cast inside to actually be an integer
-		vector<int> v = i->getFactors(); // Creating a new vector v and then using it in getFactors()
+		// Cast 'inside' to actually be an integer
+		Integer* i = (Integer*) inside;
 
-		sort(v.begin(), v.end()); // Arranging the elements of vector v in ascending numerical order
+		// Check if 'inside' is one, if so return one
+		if (i->getInteger() == 1) {
+			return i;
+		}
 
-		int count = 0; // Count variable to keep track of like factors
+		// Creating a new vector v and then using it in getFactors()
+		vector<int> v = i->getFactors();
+
+		// Arranging the elements of vector v in ascending numerical order
+		sort(v.begin(), v.end());
+
+		int count = 0; // Count variable to keep track of like-factors
 		int current = 0; // Variable we're looking for
 		int outside = 1; // Outside of square root has 1
 
-
-
-		for (int i = 0; i <= v.size(); i++) { // Iterate through the vector one at a time
+		for (unsigned int i = 0; i <= v.size(); i++) {
 			if (current != v[i]) {
-				current = v[i]; // Set the current index to the current variable
+				current = v[i];
 				count = 1;
 			}
 			else {
@@ -72,15 +95,16 @@ Number* Root::calculate() {
 					count = 0;
 				}
 			}
-		} // End of for-loop
+		}
 
-		// inside = (inside) / (outside)^root;
+		// (outside)^root;
 		int answer = 1;
 		for (int i = 0; i < root ; i++ ) {
 			answer *= outside;
 		}
 
-		Root* r = new Root(new Integer (i->getInteger()/answer), root);
+		// inside = (inside) / (outside)^root;
+		Root* r = new Root((new Integer(i->getInteger()/answer)), root);
 
 		Number** terms = new Number*[2];
 		terms[0] = new Integer(outside);
@@ -88,7 +112,125 @@ Number* Root::calculate() {
 
 		return new Multiplication(terms, 2);
 	}
+	//////////////////////////////////////////////////////////////////////////
+	else if (insideType == "class Constant") {
+		return this;
+	}
+	//////////////////////////////////////////////////////////////////////////
+	else if (insideType == "class Exponent") {
 
+		// Cast 'inside' to actually be an exponent
+		Exponent* exp = (Exponent*) inside;
+
+		Number* power = exp->getPower();
+
+		if (typeid(power) == typeid(Integer*)) {
+
+			// Casting 'power' to be an int
+			Integer* i = (Integer*) power;
+
+			int outsidePower = i->getInteger() / root;
+			int insidePower = i->getInteger() % root;
+
+			i = new Integer( ((i->getInteger()) / root) );
+
+			Exponent* outside = new Exponent(inside, new Integer(outsidePower));
+			Exponent* in = new Exponent(inside, new Integer(insidePower));
+
+			Root* r = new Root(in, root);
+
+			Multiplication* mult = new Multiplication(r, outside);
+
+			return mult;
+		}
+
+		if (typeid(power) == typeid(Fraction*)) {
+
+			// Casting 'power' to be a fraction
+			Fraction* f = (Fraction*) power;
+
+			Number* numerator = f->getNumerator();
+			Number* denominator = f->getDenominator();
+
+			int n;
+			int d;
+
+			if (typeid(*numerator) == typeid(Integer*)) {
+				n = ((Integer*)numerator)->getInteger();
+
+			}
+			else {
+				return this;
+			}
+
+
+			if (typeid(*denominator) == typeid(Integer*)) {
+				d = ((Integer*)denominator)->getInteger();
+			}
+			else {
+				return this;
+			}
+
+			Exponent* newExp = new Exponent(inside, new Integer(n));
+
+			Root* rt = new Root(newExp, d * root);
+
+			return rt->calculate();
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////
+	else if (insideType == "class Fraction") {
+
+		// Casting the inside number in the radical to be of type Fraction
+		Fraction* f = (Fraction*) inside;
+
+		// Now need to make both the numerator and the denominator their
+		// own radical with the same root
+		Number* top;
+		Number* bottom;
+
+		top = f->getNumerator();
+		Root* numRt = new Root(top, root);
+
+
+		bottom = f->getDenominator();
+		Root* denRt = new Root(bottom, root);
+
+		Fraction* radFrac = new Fraction(numRt, denRt);
+
+		return radFrac->calculate();
+	}
+	//////////////////////////////////////////////////////////////////////////
+	else if (insideType == "class Root") {
+
+		// Casting the inside to be of type Root
+		Root* r = (Root*) inside;
+
+		int newRoot = 1;
+		newRoot = newRoot * r->getRoot();
+
+
+		// Making the new final root
+		Root* finalRt = new Root(inside,newRoot);
+
+		return finalRt->calculate();
+	}
+	//////////////////////////////////////////////////////////////////////////
+	else if (insideType == "class Multiplication") {
+		// Casting inside to multiplication
+		Multiplication* m = (Multiplication*) inside;
+
+		// Making my own array
+		Number** radArray = new Number*[m->getSize()];
+
+		// Make each term its own root
+		for (unsigned int i = 0; i <= m->getSize(); i++) {
+			radArray[i] = new Root((m->getTerms())[i], root);
+		}
+
+		return m->calculate();
+	}
+	//////////////////////////////////////////////////////////////////////////
 
 	return this;
 }
@@ -111,9 +253,18 @@ double Root::getDecimal() {
 }
 
 bool Root::equals(Number* number){
-	return false;
-}
 
+	// See if it's a root
+	if (typeid(*number) != typeid(Root)) {
+		return false;
+	}
+
+	// If so, cast it to a root
+	Root* r = (Root*)number;
+
+	// Make sure insides are equal and roots are equal
+	return(r->root == this->root && r->inside->equals(this->inside));
+}
 
 Root::~Root() {
 }

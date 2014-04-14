@@ -1,69 +1,69 @@
-/*
- * Constant.cpp
- *
- *  Created on: Apr 6, 2014
- *      Author: Jackson
- */
+//============================================================================
+// Created on  : 04.06.14
+// File        : Constant.cpp
+// Description : This class will represent the two constants, pi and e.
+//============================================================================
 
 #include "Constant.h"
-
 #include <stdexcept>
 
-#include <typeinfo>
-
-using namespace std;
-
-
-//TODO: Is there a way to make this more readable? Enumerations in C++?
-
+/* Initialization constructor. Sets the values of pi and e to true and throws
+ * an exception just in case a constant other than pi or e is detected.
+ */
 Constant::Constant(bool isPi, bool isE) {
 	this->pi = isPi;
 	this->e = isE;
-	if(!pi == !e)
+	if (!pi && !e) {
 		throw out_of_range("Constant must be either e or pi");
+	}
 }
 
-bool Constant::IsE(){
-	return e;
-}
-
-bool Constant::IsPi(){
+bool Constant::IsPi() {
 	return pi;
 }
 
+bool Constant::IsE() {
+	return e;
+}
 
-Number* Constant::calculate(){
+/* No need for calculation of a constant for this assignment, so it just
+ * returns itself.
+ */
+Number* Constant::calculate() {
 	return this;
 }
 
-string Constant::getString(){
-	if(pi)
+string Constant::getString() {
+	if (pi == true) {
 		return "pi";
-	else if(e)
+	}
+	else if (e == true) {
 		return "e";
-	else
+	}
+	else {
 		throw out_of_range("Constant must be either e or pi");
+	}
 }
 
-double Constant::getDecimal(){
-	if(pi)
+double Constant::getDecimal() {
+	if (pi == true) {
 		return 3.14159265358979323846;
-	else if(e)
+	}
+	else if (e == true) {
 		return 2.71828182845904523536;
-	else
+	}
+	else {
 		throw out_of_range("Constant must be either e or pi");
+	}
 }
-
 
 bool Constant::equals(Number* number){
-	if(typeid(*number) != typeid(Constant))
+	if (typeid(*number) != typeid(Constant)) {
 		return false;
-
+	}
 	Constant* c = (Constant*) number;
-
-	return (this->pi == c->pi && this->e == c->e);
+	return ((this->pi == c->pi) && (this->e == c->e));
 }
 
 Constant::~Constant() {
 }
-

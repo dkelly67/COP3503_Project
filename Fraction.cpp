@@ -1,19 +1,16 @@
+#include "Root.h"
+#include "Integer.h"
+#include "Fraction.h"
+#include "Exponent.h"
+#include "Constant.h"
+#include "Summation.h"
+#include "Logarithm.h"
+#include "Multiplication.h"
 
-
+#include <vector>
 #include <sstream>
 #include <typeinfo>
 #include <iostream>
-#include "Fraction.h"
-#include "Integer.h"
-#include "Constant.h"
-#include <vector>
-#include "Multiplication.h"
-#include "Root.h"
-#include "Exponent.h"
-#include "Summation.h"
-#include "Logarithm.h"
-
-using namespace std;
 
 Fraction::Fraction(Number* num, Number* den){
 	this->num = num;
@@ -232,10 +229,6 @@ Number* Fraction::calculate(){
 		}
 
 	}
-
-
-
-
 
 	return this;
 }
