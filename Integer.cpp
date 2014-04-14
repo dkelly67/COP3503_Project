@@ -1,77 +1,91 @@
-//============================================================================
-// Author      : Jackson Benfer
-// Created on  : 04.06.14
-// File        : Integer.cpp
-// Description : This class will represent all integers in our program.
-//============================================================================
+/*
+ * Integer.cpp
+ *
+ *  Created on: Apr 6, 2014
+ *      Author: Jackson
+ */
 
 #include "Integer.h"
 #include <sstream>
 #include <iostream>
 #include <typeinfo>
 
+using namespace std;
+
+
 Integer::Integer(int i) {
 	this->theInteger = i;
 }
 
-int Integer::getInteger() {
+
+int Integer::getInteger(){
 	return theInteger;
 }
 
-/* Creates an empty vector of pointers of type int called factors and then
- * passes that into the getFactors() method along with TheInteger to be
- * factored.
- */
-vector<int> Integer::getFactors() {
+vector<int> Integer::getFactors(){
+
 	vector<int>* factors = new vector<int>();
+
 	getFactors(theInteger, factors);
+
 	return *factors;
 }
 
-/* This function breaks up TheInteger (passed in replacing x) into
- * all of its factors. A for-loop iterates from 2 to the value of half
- * of TheInteger while a nested if-statement is used for the factorization.
- * TheInteger is tested to see if it's divisible by two. If so, i and
- * TheInteger are factors and i must be prime so it is added to the vector
- * of factors. TheInteger may still not be prime and so the method is
- * recursively called again to keep factoring it down.
- */
-void Integer::getFactors(int x, vector<int>* factors) {
-	for (int i = 2; i <= x/2; i++) {
-		if (x % i == 0) {
+
+void Integer::getFactors(int theInt, vector<int>* factors){
+
+
+	for(int i = 2; i <= theInt/2; i++){
+
+		if(theInt % i == 0){
+
+			//theInt divides evenly by 0, so i and theInt/i are factors
+
+			//i must be prime, add it to the vector of factors
+
 			factors->push_back(i);
-			getFactors(x/i, factors);
+
+			//theInt might still not be prime, keep factoring
+
+			getFactors(theInt/i, factors);
+
 			return;
 		}
 	}
-	// If we get here, then x is prime and we are done
-	factors->push_back(x);
-}
 
-/* Just as with Constant, there is no calculation to be involved regarding
- * an Integer unless an operator is used, so it just return itself.
- */
-Number* Integer::calculate() {
+	//If we get here than theInt is prime and we are done
+
+	factors->push_back(theInt);
+
+	}
+
+
+Number* Integer::calculate(){
 	return this;
 }
 
-string Integer::getString() {
+string Integer::getString(){
 	ostringstream stream;
 	stream << theInteger;
 	return stream.str();
 }
 
-double Integer::getDecimal() {
+double Integer::getDecimal(){
 	return theInteger;
 }
 
 bool Integer::equals(Number* number){
-	if(typeid(*number) != typeid(Integer)) {
+
+	if(typeid(*number) != typeid(Integer))
 		return false;
-	}
-	Integer* i = (Integer*) number;
-	return (this->getInteger() == i->getInteger());
+
+	Integer* anInt = (Integer*) number;
+
+	return (this->theInteger == anInt->theInteger);
+
 }
+
 
 Integer::~Integer() {
 }
+

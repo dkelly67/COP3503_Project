@@ -31,7 +31,6 @@ public:
 	double getDecimal(); // Returns decimal form
 	virtual string getString(); // Returns string of multiplying terms
 	virtual Number* calculate();
-	virtual Number* calculate1();
 	// Iterates through Number array, and performs calculate on specific object types
 	virtual bool equals(Number* number);
 

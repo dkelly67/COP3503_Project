@@ -7,13 +7,15 @@
 
 #ifndef ROOT_H_
 #define ROOT_H_
+
 #include "Number.h"
+
 using namespace std;
 
 class Root : public Number {
 public:
-	// Initialization constructor
-	Root(Number* inside, int root);
+	Root(Number* inside, int root); // Initialization constructor
+	virtual ~Root(); // Destructor
 
 	// Virtual functions from Number.h
 	virtual Number* calculate();
@@ -24,9 +26,6 @@ public:
 	// Class functions
 	Number* getInside();
 	int getRoot();
-
-	// Destructor
-	virtual ~Root();
 
 private:
 	// Private variables

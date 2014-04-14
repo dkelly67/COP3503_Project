@@ -23,7 +23,6 @@ Fraction::Fraction(Number* num, Number* den){
 
 Number* Fraction::calculate(){
 
-
 	if(num->equals(den))
 		return new Integer(1);
 
@@ -172,8 +171,6 @@ Number* Fraction::calculate(){
 
 	//Multiplication
 
-
-
 	if(typeid(*num) == typeid(Multiplication) || typeid(*den) == typeid(Multiplication)){
 
 	Number** numTerms;
@@ -200,24 +197,11 @@ Number* Fraction::calculate(){
 		for(int j = 0; j < denSize; j++){
 
 			Number** nP = &numTerms[i];
-			Number** dP = &denTerms[i];
+			Number** dP = &denTerms[j];
 			reduceNumbers(nP, dP);
 			numTerms[i] = *nP;
 			denTerms[i] = *dP;
-/*
-			if(numTerms[i]->equals(denTerms[j])){
-				numTerms[i] = new Integer(1);
-				denTerms[j] = new Integer(1);
-				break;
-			}
 
-			if(typeid(*numTerms[i]) == typeid(Integer) && typeid(*denTerms[j]) == typeid(Integer)){
-				Integer* n = (Integer*) numTerms[i];
-				Integer* d = (Integer*) denTerms[j];
-				if(n->getInteger() != 1 && d->getInteger() != 1)
-				reduceInts(*n,*d);
-			}
-			*/
 		}
 	}
 
@@ -349,6 +333,8 @@ void Fraction::reduceNumbers(Number** nP, Number** dP){
 		*dP = d;
 	}
 
+
+
 }
 
 
@@ -401,6 +387,7 @@ string Fraction::getString(){
 
 
 bool Fraction::equals(Number* number){
+
 	if(typeid(*number) != typeid(Fraction))
 		return false;
 	Fraction* f = (Fraction*)number;

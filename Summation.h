@@ -27,6 +27,7 @@ public:
 	double getDecimal(); //Returns decimal form
 	string getString(); //Returns string of summing terms
 	Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
+	int getSize();
 	bool equals(Number* number);
 private: //data fields
 
