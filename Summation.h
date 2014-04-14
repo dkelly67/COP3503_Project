@@ -1,38 +1,41 @@
-//Daniel Kelly
-
 #ifndef _SUMMATION_H
 #define _SUMMATION_H
 
 #include "Number.h"
-#include <typeinfo>
-#include <sstream>
-#include <iostream>
-#include <string>
 #include "Integer.h"
 #include "Fraction.h"
-class Summation : public Number
-{
+
+#include <string>
+#include <sstream>
+#include <typeinfo>
+#include <iostream>
+
+using namespace std;
+
+class Summation : public Number {
 
 public:
-
-	//Constructor: Creates Multiplication object based on an array of Number objects
+	// Constructor: Creates Multiplication object based on an array of Number objects
 	Summation(Number **terms, int size);
 
-	//Destructor
-	~Summation();
+	// Virtual Functions from Number.h
+	virtual Number** getTerms(); //Returns the Number array being summed
+	virtual double getDecimal(); //Returns decimal form
+	virtual string getString(); //Returns string of summing terms
+	virtual Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
+	virtual bool equals(Number* number);
 
-
-	//Functions
-	Number** getTerms(); //Returns the Number array being summed
-	double getDecimal(); //Returns decimal form
-	string getString(); //Returns string of summing terms
-	Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
+	// Class functions
 	int getSize();
 	bool equals(Number* number);
-private: //data fields
 
+	// Destructor
+	virtual ~Summation();
+
+private:
+	// Private Variables
 	Number** terms; //Pointer to an array of Numbers, called terms
-	int numOfTerms; //Number of terms in summmation
+	int numOfTerms; //Number of terms in summation
 };
 
 #endif //_SUMMATION_H_

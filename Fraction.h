@@ -1,10 +1,3 @@
-/*
- * Fraction.h
- *
- *  Created on: Apr 11, 2014
- *      Author: Jackson
- */
-
 #ifndef FRACTION_H_
 #define FRACTION_H_
 

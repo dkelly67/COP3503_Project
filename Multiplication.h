@@ -1,5 +1,4 @@
 //============================================================================
-// Author      : Daniel Kelly
 // Created on  : 04.12.14
 // File        : Multiplication.cpp
 // Description : This class multiplies Number types together.
@@ -24,9 +23,6 @@ public:
 	Multiplication(Number **terms, int size);
 	Multiplication(Number* num1, Number* num2);
 
-	// Destructor
-	~Multiplication();
-
 	// Virtual functions from Number.h
 	double getDecimal(); // Returns decimal form
 	virtual string getString(); // Returns string of multiplying terms
@@ -37,6 +33,9 @@ public:
 	// Class functions
 	Number** getTerms(); // Returns the Number array being multiplied
 	int getSize();
+
+	// Destructor
+	virtual ~Multiplication();
 
 private:
 	// Private Variables

@@ -1,21 +1,19 @@
 //============================================================================
-// Author      : Ross Castillo
 // Created on  : 04.12.14
 // File        : Logarithm.cpp
 // Description : This class will represent the log function of a calculator.
 //============================================================================
 
+#include "Root.h"
+#include "Integer.h"
+#include "Exponent.h"
+#include "Summation.h"
 #include "Logarithm.h"
+#include "Multiplication.h"
+
 #include <sstream>
 #include <math.h>
 #include <typeinfo>
-#include "Integer.h"
-#include "Summation.h"
-#include "Multiplication.h"
-#include "Exponent.h"
-#include "Root.h"
-
-using namespace std;
 
 Logarithm::Logarithm(Number* base, Number* arg) {
 	this->base = base;
@@ -154,8 +152,3 @@ Logarithm::~Logarithm() {
 	delete base;
 	delete arg;
 }
-
-
-
-
-

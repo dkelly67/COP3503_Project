@@ -1,5 +1,4 @@
 //============================================================================
-// Author      : Daniel Kelly
 // Created on  : 04.12.14
 // File        : Multiplication.cpp
 // Description : This class will multiply number types together.
