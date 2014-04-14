@@ -1,37 +1,42 @@
-//Daniel Kelly
+//============================================================================
+// Author      : Daniel Kelly
+// Created on  : 04.12.14
+// File        : Multiplication.cpp
+// Description : This class multiplies Number types together.
+//============================================================================
 
 #ifndef _MULTIPLICATION_H
 #define _MULTIPLICATION_H
 
 #include "Number.h"
 #include "Integer.h"
+#include "Fraction.h"
 #include <typeinfo>
 #include <sstream>
 #include <iostream>
 #include <string>
-//#include <stdio>
-class Multiplication : public Number
-{
 
+class Multiplication : public Number {
 public:
-
-	//Constructor: Creates Multiplication object based on an array of Number objects
+	// Creates Multiplication object based on an array of Number objects
 	Multiplication(Number **terms, int size);
 
-	//Destructor
+	// Destructor
 	~Multiplication();
 
+	// Virtual functions from Number.h
+	double getDecimal(); // Returns decimal form
+	string getString(); // Returns string of multiplying terms
+	Number* calculate(); // Iterates through the Number array, and performs calculate on their specific object types
+	virtual bool equals(Number* number);
 
-	//Functions
-	Number** getTerms(); //Returns the Number array being multiplied
-	double getDecimal(); //Returns decimal form
-	string getString(); //Returns string of mulltiplying terms
-	Number* calculate(); //Iterates through the Number array, and performs calculate on their specific object types
+	// Class functions
+	Number** getTerms(); // Returns the Number array being multiplied
 
-private: //data fields
-
-	Number** terms; //Pointer to an array of Numbers, called terms
-	int numOfTerms; //Number of terms in multiplicative array
+private:
+	// Private Variables
+	Number** terms; // Pointer to an array of Numbers, called terms
+	int numOfTerms; // Number of terms in multiplicative array
 };
 
 #endif //_MULTIPLICATION_H_
