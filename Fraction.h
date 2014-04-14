@@ -10,6 +10,7 @@
 
 #include "Number.h"
 #include "Integer.h"
+#include "Exponent.h"
 
 using namespace std;
 
@@ -33,8 +34,7 @@ private:
 	Number* den;
 
 	void reduceInts(Integer& n, Integer& d);
-
-
+	void reduceNumbers(Number** n, Number** d);
 };
 
 

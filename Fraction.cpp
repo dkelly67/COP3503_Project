@@ -18,11 +18,11 @@ using namespace std;
 Fraction::Fraction(Number* num, Number* den){
 	this->num = num;
 	this->den = den;
-	
 }
 
 
 Number* Fraction::calculate(){
+
 
 	if(num->equals(den))
 		return new Integer(1);
@@ -30,7 +30,9 @@ Number* Fraction::calculate(){
 
 	num = num->calculate();
 	den = den->calculate();
-	
+
+
+
 	if(typeid(*num) == typeid(Integer)){
 		if(((Integer*)num)->getInteger() == 0)
 			return new Integer(0);
@@ -159,6 +161,15 @@ Number* Fraction::calculate(){
 	}
 
 
+
+	//Exponents
+
+	Number** nP = &num;
+	Number** dP = &den;
+	reduceNumbers(nP, dP);
+	num = *nP;
+	den = *dP;
+
 	//Multiplication
 
 
@@ -187,11 +198,26 @@ Number* Fraction::calculate(){
 
 	for(int i = 0 ; i < numSize; i++){
 		for(int j = 0; j < denSize; j++){
+
+			Number** nP = &numTerms[i];
+			Number** dP = &denTerms[i];
+			reduceNumbers(nP, dP);
+			numTerms[i] = *nP;
+			denTerms[i] = *dP;
+/*
 			if(numTerms[i]->equals(denTerms[j])){
 				numTerms[i] = new Integer(1);
 				denTerms[j] = new Integer(1);
 				break;
 			}
+
+			if(typeid(*numTerms[i]) == typeid(Integer) && typeid(*denTerms[j]) == typeid(Integer)){
+				Integer* n = (Integer*) numTerms[i];
+				Integer* d = (Integer*) denTerms[j];
+				if(n->getInteger() != 1 && d->getInteger() != 1)
+				reduceInts(*n,*d);
+			}
+			*/
 		}
 	}
 
@@ -216,7 +242,7 @@ Number* Fraction::calculate(){
 		Logarithm* n = (Logarithm*)num;
 		Logarithm* d = (Logarithm*)den;
 
-		if(n->getBase() == d->getBase()){
+		if(n->getBase()->equals(d->getBase())){
 			Logarithm* log = new Logarithm(d->getArg(), n->getArg());
 			return log->calculate();
 		}
@@ -267,6 +293,64 @@ void Fraction::reduceInts(Integer& n, Integer& d){
 	d = Integer(denValue);
 
 }
+
+
+void Fraction::reduceNumbers(Number** nP, Number** dP){
+
+	Number* n = *nP;
+	Number* d = *dP;
+
+	//Same:
+
+	if(n->equals(d)){
+		*n = Integer(1);
+		*d = Integer(1);
+	}
+
+	//Int:
+
+	if(typeid(*n) == typeid(Integer) && typeid(*d) == typeid(Integer())){
+
+		reduceInts(*(Integer*)n, *(Integer*)d);
+
+	}
+
+
+	if(typeid(*n) == typeid(Exponent) || typeid(*d) == typeid(Exponent)){
+
+
+		Exponent* n1 = NULL;
+		Exponent* d1 = NULL;
+
+		if(typeid(*n) == typeid(Exponent))
+			n1 = (Exponent*)n;
+		else
+			n1 = new Exponent(n, new Integer(1));
+
+		if(typeid(*d) == typeid(Exponent))
+			d1 = (Exponent*)d;
+		else
+			d1 = new Exponent(d, new Integer(1));
+
+
+		if(n1->getInside()->equals(d1->getInside())){
+			Multiplication* mult = new Multiplication(d1->getPower(), new Integer(-1));
+			Number** terms = new Number*[2];
+			terms[0] = n1->getPower();
+			terms[1] = mult;
+			Summation* p = new Summation(terms, 2);
+			n1 = new Exponent(n1->getInside(), p);
+		}
+
+		n = n1;
+		d = new Integer(1);
+
+		*nP = n;
+		*dP = d;
+	}
+
+}
+
 
 
 

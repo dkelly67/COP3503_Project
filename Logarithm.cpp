@@ -35,11 +35,14 @@ Number* Logarithm::getArg() {
 Number* Logarithm::calculate() {
 
 
-	if(base->equals(arg))
+	if(base->equals(arg)){
 		return new Integer(1);
+	}
+
+	arg = arg->calculate();
 
 
-	if(typeid(arg) == typeid(Integer)){
+	if(typeid(*arg) == typeid(Integer)){
 
 		Integer* theInt = (Integer*) arg;
 
@@ -124,7 +127,7 @@ Number* Logarithm::calculate() {
 string Logarithm::getString() {
 	ostringstream stream;
 
-	stream << "log_" << base << ":(" << arg << ")";
+	stream << "log_" << base->getString() << ":(" << arg->getString() << ")";
 
 	return stream.str();
 }
