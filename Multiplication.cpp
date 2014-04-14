@@ -43,6 +43,7 @@ string Multiplication::getString() {
 	string num;
 	string numberString;
 	for (int i = 0; i < this->numOfTerms; i++) {
+
 		num = this->terms[i]->getString();
 		if (i == 0) {
 			numberString = num;
@@ -61,7 +62,91 @@ bool Multiplication::equals(Number * number) {
 /* Calls calculate on each object type within terms, then multiplies the
  * Numbers together to provide symbolic calculation.
  */
-Number* Multiplication::calculate() {
+Number* Multiplication::calculate()
+{
+
+	//Works with ints
+	for (int i = 0; i < this->numOfTerms; i++)
+	{
+		terms[i] = terms[i]->calculate();
+	}
+
+
+	if (numOfTerms == 1)
+		return this->terms[0];
+	for (int i = 0; i < this->numOfTerms; i++)
+	{
+
+		for (int j = i + 1; j < this->numOfTerms; j++)
+		{
+			if ((typeid(*this->terms[i]) == typeid(Integer)) && (typeid(*this->terms[j]) == typeid(Integer)))
+			{
+				Number* product = new Integer(((Integer*)terms[i])->getInteger() * ((Integer*)terms[j])->getInteger());
+				return recursiveStep(product, i, j);
+			}
+
+
+
+
+			if ((typeid(*this->terms[i]) == typeid(Integer)) || (typeid(*this->terms[i]) == typeid(Fraction)))
+			if ((typeid(*this->terms[j]) == typeid(Integer)) || (typeid(*this->terms[j]) == typeid(Fraction)))
+			{
+				Fraction* f1 = NULL;
+				Fraction* f2 = NULL;
+
+				if(typeid(*this->terms[i]) == typeid(Integer))
+					f1 = new Fraction(terms[i], new Integer(1));
+				else
+					f1 = (Fraction*)terms[i];
+
+				if(typeid(*this->terms[j]) == typeid(Integer))
+					f2 = new Fraction(terms[j], new Integer(1));
+				else
+					f2 = (Fraction*)terms[j];
+
+				Number* product = new Fraction(new Multiplication(f1->getNumerator(), f2->getNumerator()),
+												new Multiplication(f1->getDenominator(), f2->getDenominator()));
+
+				return recursiveStep(product, i, j);
+
+			}
+
+			if (typeid(*this->terms[i]) == typeid(*this->terms[j]) && typeid(*this->terms[i]) == typeid(Integer))
+			{
+
+			}
+		}
+
+
+
+	}
+
+	return this;
+}
+
+
+Number* Multiplication::recursiveStep(Number* product, int i, int j){
+
+	Number** newTerms = new Number*[numOfTerms - 1];
+	newTerms[0] = product;
+	int l = 1;
+	for (int k = 0; k < this->numOfTerms; k++)
+	{
+		if (k != i && k != j){
+			newTerms[l] = terms[k];
+				l++;
+		}
+	}
+
+	Multiplication* ans = new Multiplication(newTerms, numOfTerms - 1);
+	//ans->calculate()->getString();
+	return ans->calculate();
+}
+
+
+
+
+Number* Multiplication::calculate1() {
 
 	Number* intTotal = new Integer(1);
 	Number* total = NULL;
@@ -107,6 +192,27 @@ Number* Multiplication::calculate() {
 			Multiplication* ans = new Multiplication(newTerms, numOfTerms + mult->numOfTerms);
 
 			return ans->calculate();
+		}
+
+
+		if(typeid(*term) == typeid(Summation)){
+			Summation* s = (Summation*)term;
+			Number** numbers = new Number*[s->getSize()];
+			Number** otherTerms = new Number*[numOfTerms];
+			int j = 0;
+			for(int i = 0; i < numOfTerms; i++){
+				if(terms[i] != s){
+					otherTerms[j] = terms[i];
+					j++;
+				}
+			}
+			Multiplication* multOtherTerms = new Multiplication(otherTerms, numOfTerms-1);
+			for(int i = 0; i < s->getSize(); i++){
+				numbers[i] = new Multiplication(s->getTerms()[i], multOtherTerms);
+			}
+
+			Summation* theSum = new Summation(numbers, s->getSize());
+			return theSum->calculate();
 		}
 	}
 

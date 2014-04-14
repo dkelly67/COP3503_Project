@@ -11,6 +11,7 @@
 #include "Number.h"
 #include "Integer.h"
 #include "Fraction.h"
+#include "Summation.h"
 
 #include <typeinfo>
 #include <sstream>
@@ -30,6 +31,7 @@ public:
 	double getDecimal(); // Returns decimal form
 	virtual string getString(); // Returns string of multiplying terms
 	virtual Number* calculate();
+	virtual Number* calculate1();
 	// Iterates through Number array, and performs calculate on specific object types
 	virtual bool equals(Number* number);
 
@@ -41,6 +43,7 @@ private:
 	// Private Variables
 	Number** terms; // Pointer to an array of Numbers, called terms
 	int numOfTerms; // Number of terms in multiplicative array
+	Number* recursiveStep(Number* product, int i, int j);
 };
 
 #endif //_MULTIPLICATION_H_
