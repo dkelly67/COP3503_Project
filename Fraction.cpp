@@ -11,6 +11,7 @@
 #include "Root.h"
 #include "Exponent.h"
 #include "Summation.h"
+#include "Logarithm.h"
 
 using namespace std;
 
@@ -29,6 +30,12 @@ Number* Fraction::calculate(){
 	num = num->calculate();
 	den = den->calculate();
 
+
+
+	if(typeid(num) == typeid(Integer)){
+		if(((Integer*)num)->getInteger() == 0)
+			return new Integer(0);
+	}
 
 	//Root
 
@@ -206,7 +213,16 @@ Number* Fraction::calculate(){
 	}
 
 
+	if(typeid(*num) == typeid(Logarithm) && typeid(*den) == typeid(Logarithm)){
+		Logarithm* n = (Logarithm*)num;
+		Logarithm* d = (Logarithm*)den;
 
+		if(n->getBase() == d->getBase()){
+			Logarithm* log = new Logarithm(d->getArg(), n->getArg());
+			return log->calculate();
+		}
+
+	}
 
 
 
@@ -312,7 +328,6 @@ bool Fraction::equals(Number* number){
 	Number* den2 = f->den;
 
 	return num1->equals(num2) && den1->equals(den2);
-
 }
 
 

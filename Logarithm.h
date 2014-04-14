@@ -25,6 +25,8 @@ public:
 	Number* getBase();
 	Number* getArg();
 
+	bool equals(Number* number);
+
 	// Destructor
 	virtual ~Logarithm();
 
