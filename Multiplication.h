@@ -10,7 +10,7 @@
 
 #include "Number.h"
 #include "Integer.h"
-#include "Fraction.h"
+
 #include <typeinfo>
 #include <sstream>
 #include <iostream>
@@ -26,8 +26,9 @@ public:
 
 	// Virtual functions from Number.h
 	double getDecimal(); // Returns decimal form
-	string getString(); // Returns string of multiplying terms
-	Number* calculate(); // Iterates through the Number array, and performs calculate on their specific object types
+	virtual string getString(); // Returns string of multiplying terms
+	virtual Number* calculate();
+	// Iterates through Number array, and performs calculate on specific object types
 	virtual bool equals(Number* number);
 
 	// Class functions

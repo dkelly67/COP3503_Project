@@ -7,15 +7,14 @@
 
 #ifndef LOGARITHM_H_
 #define LOGARITHM_H_
-
 #include "Number.h"
-
 using namespace std;
 
 class Logarithm : public Number {
 public:
-	Logarithm(Number* base, Number* arg); // Initialization constructor
-	virtual ~Logarithm(); // Destructor
+	// Initialization constructor
+	Logarithm(Number* base, Number* arg);
+
 
 	// Virtual functions from Number.h
 	virtual Number* calculate();
@@ -25,6 +24,9 @@ public:
 	// Class functions
 	Number* getBase();
 	Number* getArg();
+
+	// Destructor
+	virtual ~Logarithm();
 
 private:
 	// Private variables

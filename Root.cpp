@@ -7,13 +7,14 @@
 
 #include "Root.h"
 #include "Integer.h"
-#include "Multipication.h"
+#include "Multiplication.h"
+#include "Number.h"
 
-#include <math.h> // For pow()
 #include <vector>
 #include <sstream>
-#include <stdexcept> // For throwing out_of_range exceptions
-#include <algorithm> // For sort()
+#include <stdexcept>
+#include <algorithm> // sort()
+#include <math.h> // pow()
 
 Root::Root(Number* inside, int root) {
 	this->inside = inside;
@@ -29,7 +30,6 @@ int Root::getRoot() {
 }
 
 Number* Root::calculate() {
-
 	string insideType = typeid(inside).name();
 
 	if (inside < 0) {
@@ -46,18 +46,22 @@ Number* Root::calculate() {
 
 	if (insideType == "class Integer") {
 
-		Integer* i = (Integer*) inside; // Cast inside to actually be an integer
-		vector<int> v = getFactors(i, v); // Creating a new vector v and then using it in getFactors()
+		// Cast inside to actually be an integer
+		Integer* i = (Integer*) inside;
 
-		sort(v.begin(), v.end()); // Arranging the elements of vector v in ascending numerical order
+		// Creating a new vector v and then using it in getFactors()
+		vector<int> v = i->getFactors();
 
-		int count = 0; // Count variable to keep track of like factors
+		// Arranging the elements of vector v in ascending numerical order
+		sort(v.begin(), v.end());
+
+		int count = 0; // Count variable to keep track of like-factors
 		int current = 0; // Variable we're looking for
 		int outside = 1; // Outside of square root has 1
 
-		for (unsigned int i = 0; i <= v.size(); i++) { // Iterate through the vector one at a time
+		for (unsigned int i = 0; i <= v.size(); i++) {
 			if (current != v[i]) {
-				current = v[i]; // Set the current index to the current variable
+				current = v[i];
 				count = 1;
 			}
 			else {
@@ -67,27 +71,29 @@ Number* Root::calculate() {
 					count = 0;
 				}
 			}
-		} // End of for-loop
+		}
 
-		// inside = (inside) / (outside)^root;
+		// (outside)^root;
 		int answer = 1;
-		for (unsigned int i = 0; i < root ; i++ ) {
+		for (int i = 0; i < root ; i++ ) {
 			answer *= outside;
 		}
 
-		Root* r = new Root(root,new Integer (i->getInteger()/answer));
+		// inside = (inside) / (outside)^root;
+		Root* r = new Root((new Integer(i->getInteger()/answer)), root);
 
-		Number** terms = {new Integer(outside), r};
+		Number** terms = new Number*[2];
+		terms[0] = new Integer(outside);
+		terms[1] = r;
 
-		return new Multipication(terms);
-	}
-
-	/////////////////////////////////////////////////////////
-	else if (insideType == "Exponent") {
-
+		return new Multiplication(terms, 2);
 	}
 	else if (insideType == "Constant") {
 		return this;
+	}
+	/////////////////////////////////////////////////////////
+	else if (insideType == "Exponent") {
+
 	}
 	else if (insideType == "Fraction") {
 
@@ -118,6 +124,10 @@ string Root::getString() {
 
 double Root::getDecimal() {
 	return pow(inside->getDecimal(), (1.0/root));
+}
+
+bool Root::equals(Number* number){
+	return false;
 }
 
 Root::~Root() {
