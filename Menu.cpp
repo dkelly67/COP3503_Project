@@ -14,9 +14,12 @@
 
 using namespace std;
 
-
 std::vector<Number*> prevAns;
 Number* ans;
+
+Number* inputHandler(string a) {
+	return 0;
+}
 
 void help() {
 	int j;
@@ -28,6 +31,11 @@ void help() {
 	cin >> j;
 	while (j==1 || j==2 || j==3){
 		if(j==1){
+			cout << "Use '+' to indicate addition." << endl;
+			cout << "Use '-' to indicate subtraction." << endl;
+			cout << "Use '*' to indicate multiplication." << endl;
+			cout << "Use '/' to indicate division." << endl;
+			cout << "Use '^' for exponentiation (ex: x^y is x to the power of y)" << endl;
 			cout << "sqrt:x is the square root of x." << endl;
 			cout << "nrt:x is for the nth root of x." << endl;
 			cout << "log_b:x is the log base b of x." << endl;
@@ -44,8 +52,8 @@ void help() {
 		else if(j==3){
 			cout << "The Review function can show all previous expressions made in the program. It can also save one in 'ans' to be used in a new expression." << endl;
 			cout << "Compute New Expression is used to create any type of expression." << endl;
-			cout << ".getDecimal() can be used to return your expression in decimal form." << endl;
-			cout << ".getString() can be used to return your expression as a string." << endl;
+			//cout << ".getDecimal() can be used to return your expression in decimal form." << endl;
+			//cout << ".getString() can be used to return your expression as a string." << endl;
 		}
 		cout << "For help with abbreviations press 1." << endl;
 		cout << "For help with the different expressions press 2." << endl;
@@ -57,15 +65,25 @@ void help() {
 
 void compNewExpression(){
 	string str;
+	string back = "back";
+	Number* num;
 	cout << "Enter the expression." << endl;
 	cin >> str;
-	cout << prevAns.insert(prevAns.begin(), inputHandler(str));
-	str = NULL;
+	//input handler
+	//calculate
+	//cout << getString();
+	//Number* ans = exp->calculate();
+	prevAns.insert(prevAns.begin(), inputHandler(str));
+	num = inputHandler(str);
+	cout << num->getString();
+	str = "";
 	cout << "\nEnter another expression or enter 'back' to return to the menu." << endl;
 	cin >> str;
-	while (str.substr(0)!='back'){
-		cout << prevAns.insert(prevAns.begin(), inputHandler(str));
-		str = NULL;
+	while (str.compare(back)!=0){
+		prevAns.insert(prevAns.begin(), inputHandler(str));
+		num = inputHandler(str);
+		cout << num->getString();
+		str = "";
 		cout << "\nEnter another expression or enter 'back' to return to the menu." << endl;
 		cin >> str;
 	}
@@ -74,8 +92,8 @@ void compNewExpression(){
 void review(vector<Number*> prevAns){
 	int num, a, count, i, n;
 	double d;
-	//std::ostringstream s2;
-	string s;
+	std::ostringstream s2;
+	//string s;
 	cout << "Enter the number of answers you wish to step back (ex: pressing 2 will display your second to last expression." << endl;
 	cout << "Alternatively, press -1 to display all previous answers." << endl;
 	cout << "Enter 0 to go back." << endl;
@@ -86,7 +104,9 @@ void review(vector<Number*> prevAns){
 		}
 		else if (num==-1){
 			for(int i=0; i<prevAns.size(); i++){
-				cout << i+":   "+prevAns[i];
+				cout << i;
+				cout << ":   ";
+				cout << prevAns[i] << endl;
 			}
 		}
 		else{
@@ -98,9 +118,12 @@ void review(vector<Number*> prevAns){
 			if (a==1) ans==prevAns[num];
 			if (a==2){
 				d = prevAns[num]->getDecimal();
-				s << d;
-				//s = s2;
-				if (d>0 && d<10) cout << d+"e0" << endl;
+				s2 << d;
+				std::string s = s2.str();
+				if (d>0 && d<10){
+					cout << d;
+					cout << "e0" << endl;
+				}
 				else if (d>10){
 					i = s.find('.');
 					while (i>1){
@@ -108,7 +131,8 @@ void review(vector<Number*> prevAns){
 						i--;
 						count++;
 					}
-					cout << s+"e"+count;
+					cout << s;
+					cout << "e"+count << endl;
 					count = 0;
 				}
 				else if (d<0){
@@ -124,7 +148,8 @@ void review(vector<Number*> prevAns){
 						i++;
 						count--;
 					}
-					cout << s+"e"+count;
+					cout << s;
+					cout << "e"+count << endl;
 					count = 0;
 				}
 			}
@@ -136,7 +161,7 @@ void review(vector<Number*> prevAns){
 	}
 }
 
-void menu() {
+void menu(){
 	//Options: Compute new expression, help, review, quit
 	int i;
 	cout << "Welcome to the menu!" << endl;

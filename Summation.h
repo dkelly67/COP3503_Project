@@ -27,7 +27,6 @@ public:
 
 	// Class functions
 	int getSize();
-	bool equals(Number* number);
 
 	// Destructor
 	virtual ~Summation();
