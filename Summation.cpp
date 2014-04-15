@@ -1,44 +1,56 @@
+//Daniel Kelly
+
 #include "Summation.h"
 
-// Constructor, initializes "Numbers" array, called "terms"
-Summation::Summation(Number ** summation, int size) {
+//Constructor, initializes "Numbers" array, called "terms"
+Summation::Summation(Number ** summation, int size)
+{
 	this->numOfTerms = size;
 	this->terms = new Number* [this->numOfTerms];
 	terms = summation;
 }
 
-// Return array of Numbers being added
-Number** Summation::getTerms() {
+//Default destructor
+Summation :: ~Summation(){}
+
+
+//Return array of Numbers being added.
+Number** Summation::getTerms()
+{
 	return this->terms;
 }
 
-int Summation::getSize() {
+int Summation::getSize()
+{
 	return this->numOfTerms;
 }
-
-// Output pure sum of entries inside 'terms'
-double Summation::getDecimal() {
+//Output pure sum of entries inside 'terms'
+double Summation::getDecimal()
+{
 	double ans = 0;
 
-	for (int i = 0; i < this->numOfTerms; i++) {
-
+	for (int i = 0; i < this->numOfTerms; i++)
+	{
+		
 		ans = ans + terms[i]->getDecimal();
 	}
 
 	return ans;
 }
 
-// Outputs the string of the summation array
-string Summation::getString() {
+//Outputs the string of the summation array
+string Summation::getString()
+{
 	string type;
 	string num;
 	string numberString;
 	bool isZero = false;
 
-	for (int i = 0; i < this->numOfTerms; i++) {
-
+	for (int i = 0; i < this->numOfTerms; i++)
+	{
+		
 		num = this->terms[i]->getString();
-		if (this->terms[i]->getString() == "0") {
+		if (this->terms[i]->getString() == "0"){
 			isZero = true;
 			continue;
 		}
@@ -51,13 +63,13 @@ string Summation::getString() {
 	return numberString;
 }
 
-bool Summation::equals(Number* number) {
+bool Summation::equals(Number* number)
+{
 	return false;
 }
-
-// Calls calculate on each object type within terms, then multiplies the Numbers
-// together to provide symbolic calculation
-Number* Summation::calculate() {
+//Calls calculate on each object type within terms, then multiplies the Numbers together to provide symbolic calculation
+Number* Summation::calculate()
+{
 	Number* sum = NULL;
 	Number* fract = NULL;
 	Number* intTotal = NULL;
@@ -65,6 +77,7 @@ Number* Summation::calculate() {
 	Number* constAdd = NULL;
 	Number* constCalc = NULL;
 	Number* constTotal = NULL;
+	Number* constMult = NULL;
 	Number* numerator1 = NULL;
 	Number* numerator2 = NULL;
 	Number* denominator1 = NULL;
@@ -117,30 +130,9 @@ Number* Summation::calculate() {
 				fractTotal = new Summation(add, numOfTerms - 1);
 				return fractTotal->calculate();
 			}
-
-			if ((typeid(this->terms[i]) == typeid(this->terms[j])) && typeid(*this->terms[i]) == typeid(Constant))
-			{
-				Constant* c = (Constant *)terms[i];
-				Number** mult = new Number*[2];
-				mult[1] = c->calculate();
-				int constCounter = 0;
-				for (int k = 0; k < this->numOfTerms; k++)
-				{
-					if (terms[k]->calculate() == mult[1])
-						constCounter++;
-				}
-
-				cout << constCounter << endl;
-				mult[0] = new Integer(constCounter);
-				constTotal = new Multiplication(mult, 2);
-				return constTotal->calculate();
-			}
 		}
 	}
+
 	return this;
 }
 
-// Destructor
-Summation :: ~Summation(){
-
-}

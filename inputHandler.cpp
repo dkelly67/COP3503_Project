@@ -52,8 +52,7 @@ bool Equation::IsAnOperand(char ch)
    if (
        ((ch >= '0') && (ch <= '9'))||
        (ch == 'v') ||
-       (ch == 'y') ||
-       (ch == '.')
+       (ch == 'y')
        )
       return true;
    else
@@ -61,7 +60,7 @@ bool Equation::IsAnOperand(char ch)
 }
 
 bool Equation::IsNumber(char ch){
-   if (((ch >= '0') && (ch <= '9'))||(ch == '.'))
+   if (((ch >= '0') && (ch <= '9')))
        return true;
     else
        return false;
@@ -276,7 +275,7 @@ double Equation::Evaluate(vector <string> &temp){
         z = pow(x,y);
         return z;
      }
-     return this;
+     return 0.0;
 }
 
 void Equation::reversePolishNotation(){
