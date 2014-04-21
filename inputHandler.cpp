@@ -1,316 +1,376 @@
-#include <cmath>
-#include <stack>
-#include <vector>
-#include <string>
+/*
+ * InputHandler.cpp
+ *
+ *  Created on: Apr 17, 2014
+ *      Author: Jackson
+ */
+
+#include "InputHandler.h"
+
 #include <sstream>
-#include <iostream>
+#include <stdexcept>
 
-using namespace std;
+#include "Constant.h"
+#include "Exponent.h"
+#include "Fraction.h"
+#include "Multiplication.h"
+#include "Summation.h"
 
-////////////////////////////////////////////////////////////////
-class Equation {
-
-public:
-        Equation();//default constructor
-        ~Equation();//default destructor
-
-        void reversePolishNotation(); //main method
-        void set(string); //main method
+class Logarithm;
+class Root;
 
 
-        double Evaluate(vector <string> &s);
-        void Convert(const string &Infix, string &ReversePoli);
-        bool ChecksPrecedence(char Op1, char Op2);
-        bool IsAnOperand(char ch);
-        bool IsAnOperator(char ch);
-        bool IsNumber(char ch);
-        string Change(string);
-        string InsertSpace(string);
-        bool CheckValid(string);
-        void Next(string);
-
-private:
-        string Infix;
-};
-////////////////////////////////////////////////////////////////
 
 
-Equation::Equation() {
-  Infix = "";
+InputHandler::InputHandler() {
+	ans = NULL;
 }
 
-Equation::~Equation(){
-}
+Number* InputHandler::parseString(string str){
 
-//a set method
-void Equation::set(string a){
-    Infix = a;
-}
+	checkFormat(str);
 
-bool Equation::IsAnOperand(char ch)
-{
-   if (
-       ((ch >= '0') && (ch <= '9'))||
-       (ch == 'v') ||
-       (ch == 'y')
-       )
-      return true;
-   else
-      return false;
-}
+	for(int i = 0; i < str.length(); i++){
+		if(isOperator(str.at(i))){
+			if(str.at(i) != '-')
+				str.insert(0, "ans");
+			else
+				str.insert(0, "0");//Assume leading - is a negative sign
+			break;
+		}
+		else if(str.at(i) != ' ')
+			break;
+	}
 
-bool Equation::IsNumber(char ch){
-   if (((ch >= '0') && (ch <= '9')))
-       return true;
-    else
-       return false;
-}
+	//Add implicit *
 
-bool Equation::IsAnOperator(char ch)
-{
-    if ((ch == '+') ||
-        (ch == '-') ||
-        (ch == '*') ||
-        (ch == '/') ||
-        (ch == '^'))
-        return true;
-     else
-        return false;
+	addMultiplication(str);
+
+	//Add implicit parenthesis (for pemdas)
+	addParenthesis(str, '^', 0);
+	addParenthesis(str, '*', '/');
+
+
+	ans = parseString(str, 0, str.length());
+	return ans;
 }
 
 
-bool Equation::ChecksPrecedence(char Op1, char Op2){
-   if (Op1== '(')
-      return false;
-   else if (Op2 == '(')
-      return false;
-   else if (Op2 == ')')
-      return true;
-   else if ((Op1 == '^') && (Op2== '^'))
-      return false;
-   else if (Op1 == '^')
-      return true;
-   else if (Op2 == '^')
-      return false;
-   else if ((Op1 == '*') || (Op1 == '/'))
-      return true;
-   else if ((Op2 == '*') || (Op2 == '/'))
-      return false;
-   else
-      return true;
+bool InputHandler::checkFormat(string str){
+
+	int counter = 0;
+	bool lastOperator = false;
+	for(int i = 0; i < str.length(); i++){
+		char c = str.at(i);
+
+		//Parenthesis
+		if(c == '(')
+			counter++;
+		if(c == ')'){
+			if(lastOperator)
+				throw out_of_range("Trailing operator within parenthesized expression");
+			counter--;
+		}
+
+		//Operators
+		if(isOperator(c)){
+			if(lastOperator && c != '-')
+				throw out_of_range("Subsequent operators not allowed");
+			lastOperator = true;
+		}
+		else if(c != ' ')
+			lastOperator = false;
+	}
+
+	if(counter != 0)
+		throw out_of_range("Improper use of parenthesis");
+
+	if(lastOperator)
+		throw out_of_range("Trailing Operator");
+
+
+
+	return true;
 }
 
-void Equation::Convert(const string &Infix, string &ReversePoli){
-   stack <char> OperatorStack;
-   char TopSymbol, Symbol;
-   int k;
 
-   for (k=0; k<Infix.size(); k++){
-      Symbol = Infix[k];
-      if (IsAnOperand(Symbol))
-         ReversePoli = ReversePoli + Symbol;
-      else{
-         while ((!OperatorStack.empty()) && (ChecksPrecedence(OperatorStack.top(), Symbol))){
-            TopSymbol = OperatorStack.top();
-            OperatorStack.pop();
-            ReversePoli = ReversePoli + TopSymbol;
-            }
-         if ((!OperatorStack.empty()) && (Symbol == ')'))
-            OperatorStack.pop();
-         else
-            OperatorStack.push(Symbol);
-      }
-   }
-
-   while (!OperatorStack.empty()){
-      TopSymbol = OperatorStack.top();
-      OperatorStack.pop();
-      ReversePoli = ReversePoli + TopSymbol;
-   }
+void InputHandler::addMultiplication(string& str){
+	for(int i = 0; i < str.length(); i++){
+		if(str.at(i) == '('){
+			for(int j = i-1; j >= 0; j--){
+				if(isOperator(str.at(j)) || str.at(j) == ':')
+					break;
+				else if(str.at(j) != ' '){
+					str.insert(j+1, "*");
+					i++;
+					break;
+				}
+			}
+		}
+		if(str.at(i) == ')'){
+			for(int j = i+1; j < str.length(); j++){
+				if(isOperator(str.at(j)))
+					break;
+				else if(str.at(j) != ' '){
+					str.insert(j, "*");
+					i++;
+					break;
+				}
+			}
+		}
+	}
 }
 
-string Equation::Change(string tmp){
-    for(int i=0; i<tmp.length(); i++){
-      if(IsNumber(tmp[i])==true){
-          if(IsNumber(tmp[i+1])==false){
-              tmp.insert(i+1, "v");
-          }
-      }
-    }
-    for (int i=0; i<tmp.length(); i++){
-        if(tmp[i]=='-'){
-            if((tmp[i-1]!='v')&&(tmp[i-1]!=')')){
-               tmp.replace(i,1,"y");
-            }
-        }
-    }
-    return tmp;
+
+void InputHandler::addParenthesis(string& str, char op1, char op2){
+
+	int counter = 0;
+
+	for(int i = 0; i < str.length(); i++){
+		if(str.at(i) == op1 || str.at(i) == op2){
+			//Left
+			counter = 0;
+			for(int j = i-1; j >=0; j--){
+				if(str.at(j) == ')')
+					counter++;
+				else if(str.at(j) == '(')
+					counter--;
+				if(counter == -1)
+					break;
+				else if(isOperator(str.at(j)) && counter == 0){
+					str.insert(j+1, "(");
+					i++;
+					break;
+				}
+				if(j == 0){
+					str.insert(0, "(");
+					i++;
+					break;
+				}
+			}
+
+			//Right
+			counter = 0;
+			for(int j = i+1; j < str.length(); j++){
+				if(str.at(j) == '(')
+					counter++;
+				else if(str.at(j) == ')')
+					counter--;
+				if(counter == -1)
+					break;
+				else if(isOperator(str.at(j)) && counter == 0){
+					str.insert(j, ")");
+					break;
+				}
+				if(j == str.length()-1){
+					str.append(")");
+					break;
+				}
+
+			}
+		}
+	}
 }
 
-string Equation::InsertSpace(string tmp)
-{
-    for(int i=0; i<tmp.length(); i++){
-         if(IsAnOperator(tmp[i])==true){
-            tmp.insert(i+1, " ");
-            //Inserts a space after an operator is found
-          }
-           else if( tmp[i]=='v' ){
-              tmp.replace(i,1," ");
-              //replaces any v with a space
-           }
-    }
 
-    for(int i = 0; i<tmp.length(); i++){
-        if(tmp[i]=='y'){
-             tmp.replace(i,1,"-");
-        }
-     }
-    return tmp;
+Number* InputHandler::parseString(string str, int start, int end){
+
+	Number* num;
+	Number* newNum;
+	int j = 1;
+	char op = ' ';
+
+	for(int i = start; i < end; i+=j){
+
+		j = 1;
+
+		char c = str.at(i);
+
+		if(c != ' ' && !isOperator(c)){
+
+			//Must be a number
+			newNum = readNumber(str, i, j);
+
+			if(op == '+')
+				num = new Summation(num, newNum);
+			else if(op == '-')
+				num = new Summation(num, new Multiplication(new Integer(-1), newNum));
+			else if(op == '*')
+				num = new Multiplication(num, newNum);
+			else if(op == '/')
+				num = new Fraction(num, newNum);
+			else if(op == '^')
+				num = new Exponent(num, newNum);
+			else{
+				num = newNum;
+			}
+
+			op = ' ';
+		}
+		if(isOperator(c)){
+			op = c;
+		}
+		newNum = 0;
+	}
+	return num;
 }
 
-bool Equation::CheckValid(string tmp){
-    for(int i=0; i<tmp.length(); i++){
-        if((tmp[i]=='+')||(tmp[i]=='-')){
-            if((tmp[i+1]=='+')||(tmp[i+1]=='-')){
-                return false;
-            }
-        }
-    }
 
-    string array = "0123456789+-*/^().";
+Number* InputHandler::parseParenthesis(string str, int start, int& j){
 
-    int count = 0;
-    for(int i=0; i<tmp.length(); i++){
-        for(int j=0; j<array.length(); j++){
-            if(tmp[i]==array[j]){
-               count++;
-            }
-        }
-    }
-
-    if(count==tmp.length()){
-      return true;
-    }
-    else{
-      return false;
-    }
-
+	int counter = 1;
+	j = 1;
+	for(int i = start + 1; i < str.length(); i++){
+		j++;
+		char c = str.at(i);
+		if(c == '(')
+			counter++;
+		else if (c == ')')
+			counter--;
+		if(counter <= 0)
+			return parseString(str, start+1, i);
+	}
 }
 
-void Equation::Next(string tmp){
-  vector <string> array;
 
-  int spaces = 0;
-  for (int a=0; a<tmp.length(); a++ ){
-      if(tmp[a]==' '){
-          spaces++;
-      }
-  }
-   string token;
-   istringstream iss(tmp);
-   while(getline(iss, token, ' ') ){
-      array.push_back(token);
-   }
-  //this initializes the stack
-  stack <string> my_stack;
-  vector <string> temp;
-  string ch;
+Number* InputHandler::readInteger(string str, int i, int& j){
 
-  for(int i=0; i<spaces; i++){
-      string s;
-      s = array[i]; //make it easier to read
+	ostringstream stream;
+	j = 0;
+	for(; i < str.length(); i++){
+			char c = str.at(i);
+			if(isInt(c)){
+				stream << c;
+				j++;
+			}
+			//Found it convenient to handle 2pi, 2e, 2sqrt, and nrt here
 
-      if((s!="+")&&(s!="*")&&(s!="-")&&(s!="^")&&(s!="/")){
-        my_stack.push(s);//pushes numbers onto the stack
-      }
-         else{//if an operator is found instead
-            my_stack.push(s);//pushes the operator onto stack
-
-               for(int i=0; i<3; i++ ){
-                 temp.push_back(my_stack.top());
-                 my_stack.pop(); //removes from the stack
-               }
-
-               double z;
-               z = Evaluate(temp);
-               ostringstream outs;
-               outs << z;   // Converts value into a string.
-               ch = outs.str();
-
-               my_stack.push(ch);
-               temp.clear();
-          }
-  }
-  cout << ch;
-
+			else if(str.substr(i, 3) == "rt:"){
+				int a;
+				string s = stream.str();
+				istringstream (s) >> a;
+				int one = 0;
+				Number* num =  new Root(readNumber(str, i+3, one), a);
+				j+= one + 3;
+				return num;
+			}
+			else if(str.substr(i, 2) == "pi"){
+				int a;
+				string s = stream.str();
+				istringstream (s) >> a;
+				Number* num =  new Multiplication(new Integer(a), new Constant(true, false));
+				j += 2;
+				return num;
+			}
+			else if(str.substr(i, 5) == "sqrt:"){
+				int a;
+				string s = stream.str();
+				istringstream (s) >> a;
+				int one = 0;
+				Number* num =  new Multiplication(new Integer(a), new Root(readNumber(str, i+5, one), 2));
+				j += one + 5;
+				return num;
+			}
+			else if(c == 'e'){
+				int a;
+				string s = stream.str();
+				istringstream (s) >> a;
+				int one = 0;
+				Number* num =  new Multiplication(new Integer(a), new Constant(false, true));
+				j++;
+				return num;
+			}else{
+				break;
+			}
+	}
+	int a;
+	string s = stream.str();
+	istringstream (s) >> a;
+	return new Integer(a);
 }
 
-double Equation::Evaluate(vector <string> &temp){
 
-    string a,b,c;
-    a = temp[2]; b = temp[0]; c = temp[1];
-    double x,y,z;
-    istringstream ins1,ins2;
-    ins1.str(a); ins2.str(c);
-    ins1 >> x;
-    ins2 >> y;
 
-     if(b == "+"){
-        z = x + y;
-        return z;
-     }
-     else if(b == "-"){
-        z = x - y;
-        return z;
-     }
-     else if(b == "*"){
-        z = x * y;
-        return z;
-     }
-     else if(b == "/"){
-        z = x / y;
-        return z;
-     }
-     else if(b == "^"){
-        z = pow(x,y);
-        return z;
-     }
-     return 0.0;
+
+
+
+Number* InputHandler::readNumber(string str, int i, int& j){
+
+
+	char c = str.at(i);
+	Number* newNum;
+	j = 0;
+
+
+	//int
+	if(isInt(c))
+		newNum = this->readInteger(str, i, j);
+	//pi, e
+
+	if(c == 'p')
+	if(str.at(i + 1) == 'i') {
+		newNum = new Constant(true, false);
+		j = 2;
+	}
+
+	if(c == 'e'){
+		newNum = new Constant(false, true);
+		j = 1;
+	}
+
+	//Log
+	if(str.substr(i, 4) == "log_"){
+		int one;
+		Number* base = readNumber(str, i+4, j);
+		one = j;
+		Number* inside = readNumber(str, i+5+j, j);
+		newNum = new Logarithm(base, inside);
+		j += one + 5;
+	}
+
+	//Root
+	if(str.substr(i, 5) == "sqrt:"){
+		newNum = new Root(readNumber(str, i+5, j), 2);
+		j += 5;
+	}
+
+	//ans
+	if(str.substr(i, 3) == "ans"){
+		newNum = ans;
+		j = 3;
+	}
+
+	// Parenthesis
+
+	if(c == '(')
+		newNum = parseParenthesis(str, i, j);
+
+
+	//Prevent infinie loops
+	if(j == 0)
+		j = 1;
+
+
+	return newNum;
 }
 
-void Equation::reversePolishNotation(){
-    string ReversePoli;
-    if(CheckValid(Infix)==true){
 
-      string temp;
-      temp = Change(Infix);
 
-      Convert(temp, ReversePoli);
+bool InputHandler::isInt(char c){
+	int i = c - 48;
 
-      cout << "Reverse Polish Notation:" << endl
-      << InsertSpace(ReversePoli);
-
-      string hold;
-      hold = InsertSpace(ReversePoli);
-
-      cout << "\n\nResult: ";
-      Next(hold);
-      cout << "\n\n";
-    }
-    else{
-        cout << "This is an invalid expression.";//change
-    }
+	if(i >= 0 && i <= 9)
+		return true;
+	else
+		return false;
 }
 
-int main(){//this is just to test the inputhandling
-    Equation a;
-    cout << "Input your expression: " << endl;
-    string x;
-    cin >> x;
-    a.set(x);
-    a.reversePolishNotation();
-    cin.get();
-
-    return 0;
-
+bool InputHandler::isOperator(char c){
+	return (c == '+' || c == '/' || c == '*' || c == '-' || c == '^');
 }
+
+
+
+InputHandler::~InputHandler() {
+}
+
