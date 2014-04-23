@@ -33,6 +33,8 @@ public:
 	virtual Number* calculate();
 	// Iterates through Number array, and performs calculate on specific object types
 	virtual bool equals(Number* number);
+	virtual bool isLikeTerm(Multiplication* number);
+	int getIntComponent();
 
 	// Class functions
 	Number** getTerms(); // Returns the Number array being multiplied

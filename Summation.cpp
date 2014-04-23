@@ -57,10 +57,7 @@ string Summation::getString()
 
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
-		if(typeid(*terms[i]) != typeid(Integer) && typeid(*terms[i]) != typeid(Constant))
-			stream << "(" << terms[i]->getString() << ")";
-		else
-			stream << terms[i]->getString();
+		stream << terms[i]->getString();
 		if(i < numOfTerms-1)
 			stream << " + ";
 	}
@@ -70,21 +67,57 @@ string Summation::getString()
 
 bool Summation::equals(Number* number)
 {
-	return false;
+
+	if(number == NULL)
+		return false;
+
+	if(typeid(*number) != typeid(Summation))
+		return false;
+
+
+	Summation* m = (Summation*) number;
+
+	if(numOfTerms != m->numOfTerms)
+		return false;
+
+
+	Number** terms1 = terms;
+	Number** terms2 = m->terms;
+
+	int counter = 0;
+
+	for(int i = 0; i < numOfTerms; i++){
+		for(int j = 0; j < m->numOfTerms; j++){
+			if(terms1[i] != NULL && terms2[j] != NULL)
+			if(terms1[i]->equals(terms2[j])){
+				terms1[i] = NULL;
+				terms2[j] = NULL;
+				counter++;
+				continue;
+			}
+		}
+	}
+
+	return counter == numOfTerms;
 }
 
 
 
 Number* Summation::calculate()
 {
+
+
 	//If only one term
 
 	if (numOfTerms == 1)
 		return terms[0]->calculate();
 
-	//Check for summations inside summations
+
 
 	for (int i = 0; i < this->numOfTerms; i++){
+
+		//Check for summations inside summations
+
 
 		if(typeid(*terms[i]) == typeid(*this)){
 
@@ -116,11 +149,38 @@ Number* Summation::calculate()
 		terms[i] = terms[i]->calculate();
 
 
+
+
+
 	//Combine like terms recursively
 
 	//Iterate through all possible pairs
 
 	for (int i = 0; i < this->numOfTerms; i++){
+
+
+		 //Remove zeros
+		if(typeid(*terms[i]) == typeid(Integer)){
+			if(((Integer*)terms[i])->getInteger() == 0){
+				Number** newTerms = new Number*[numOfTerms-1];
+				int k = 0;
+				for(int j = 0; j < numOfTerms; j++){
+					if(j != i){
+						newTerms[k] = terms[j];
+						k++;
+					}
+				}
+				terms = newTerms;
+				numOfTerms--;
+				i--;
+				continue;
+			}
+
+		}
+
+
+
+
 		for (int j = i + 1; j < this->numOfTerms; j++){
 
 			//Integers
@@ -201,14 +261,76 @@ Number* Summation::calculate()
 					return recursiveStep(f, i, j);
 				}
 			}
+
+			//Same term
+
+			if(terms[i]->equals(terms[j])){
+
+				Number* sum = new Multiplication(new Integer(2), terms[i]);
+				return recursiveStep(sum, i, j);
+			}
+
+
+			if(typeid(*terms[i]) == typeid(Multiplication) || typeid(*terms[j]) == typeid(Multiplication)){
+
+
+				Multiplication* m1 = NULL;
+				Multiplication* m2 = NULL;
+
+				if(typeid(*terms[i]) == typeid(Multiplication))
+					m1 = (Multiplication*)terms[i];
+				else
+					m1 = new Multiplication(new Integer(1), terms[i]);
+
+				if(typeid(*terms[j]) == typeid(Multiplication))
+					m2 = (Multiplication*)terms[j];
+				else
+					m2 = new Multiplication(new Integer(1), terms[j]);
+
+
+				if(m1->isLikeTerm(m2)){
+
+
+					int c = m1->getIntComponent() + m2->getIntComponent();
+
+
+					int a = 0;
+					if(m1->getIntComponent() != 1)
+						a = 1;
+
+					Number** newTerms = new Number*[m1->getSize()-a+1];
+					newTerms[0] = new Integer(c);
+
+
+					for(int b = a; b < m1->getSize(); b++){
+						newTerms[b-a+1] = m1->getTerms()[b];
+					}
+
+					Number* sum = new Multiplication(newTerms, m1->getSize()-a+1);
+
+					return recursiveStep(sum, i, j);
+
+				}
+
+
+			}
+
+
 		}
 	}
+
+
+	//TODO: Simplify
+
+
+
 	return this;
 }
 
 
 
 Number* Summation::recursiveStep(Number* sum, int i, int j){
+
 
 	Number** newTerms = new Number*[numOfTerms - 1];
 	newTerms[0] = sum;
@@ -222,6 +344,7 @@ Number* Summation::recursiveStep(Number* sum, int i, int j){
 	}
 
 	Summation* ans = new Summation(newTerms, numOfTerms - 1);
+
 	return ans->calculate();
 }
 
