@@ -28,6 +28,10 @@ InputHandler::InputHandler() {
 
 Number* InputHandler::parseString(string str){
 
+	if(str == "")
+		throw out_of_range("Empty String");
+
+
 	checkFormat(str);
 
 	for(int i = 0; i < str.length(); i++){
@@ -230,6 +234,7 @@ Number* InputHandler::parseParenthesis(string str, int start, int& j){
 		if(counter <= 0)
 			return parseString(str, start+1, i);
 	}
+	return NULL;
 }
 
 
