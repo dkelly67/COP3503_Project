@@ -34,7 +34,6 @@ Number* Root::calculate() {
 	// Calculate the inside first before anything
 	inside = inside->calculate();
 
-
 	// Necessary checks
 	if (inside < 0) {
 		throw out_of_range("The inside of a square root must be positive");
@@ -60,10 +59,8 @@ Number* Root::calculate() {
 		return inside;
 	}
 
-
-	string insideType = typeid(inside).name();
 	//////////////////////////////////////////////////////////////////////////
-	if (insideType == "class Integer") {
+	if (typeid(*inside) == typeid(Integer)) {
 
 		// Cast 'inside' to actually be an integer
 		Integer* i = (Integer*) inside;
@@ -97,27 +94,29 @@ Number* Root::calculate() {
 			}
 		}
 
+
 		// (outside)^root;
 		int answer = 1;
 		for (int i = 0; i < root ; i++ ) {
 			answer *= outside;
 		}
 
-		// inside = (inside) / (outside)^root;
-		Root* r = new Root((new Integer(i->getInteger()/answer)), root);
+		int in = i->getInteger()/answer;
+		if(in != 1){
+			Root* r = new Root((new Integer(i->getInteger()/answer)), root);
 
-		Number** terms = new Number*[2];
-		terms[0] = new Integer(outside);
-		terms[1] = r;
+			Number** terms = new Number*[2];
+			terms[0] = new Integer(outside);
+			terms[1] = r;
 
-		return new Multiplication(terms, 2);
+			return new Multiplication(terms, 2);
+		}
+		else
+			return new Integer(outside);
 	}
 	//////////////////////////////////////////////////////////////////////////
-	else if (insideType == "class Constant") {
-		return this;
-	}
 	//////////////////////////////////////////////////////////////////////////
-	else if (insideType == "class Exponent") {
+	else if (typeid(*inside) == typeid(Exponent)) {
 
 		// Cast 'inside' to actually be an exponent
 		Exponent* exp = (Exponent*) inside;
@@ -179,7 +178,7 @@ Number* Root::calculate() {
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////
-	else if (insideType == "class Fraction") {
+	else if (typeid(*inside) == typeid(Fraction)) {
 
 		// Casting the inside number in the radical to be of type Fraction
 		Fraction* f = (Fraction*) inside;
@@ -201,7 +200,7 @@ Number* Root::calculate() {
 		return radFrac->calculate();
 	}
 	//////////////////////////////////////////////////////////////////////////
-	else if (insideType == "class Root") {
+	else if (typeid(*inside) == typeid(Root)) {
 
 		// Casting the inside to be of type Root
 		Root* r = (Root*) inside;
@@ -216,7 +215,7 @@ Number* Root::calculate() {
 		return finalRt->calculate();
 	}
 	//////////////////////////////////////////////////////////////////////////
-	else if (insideType == "class Multiplication") {
+	else if (typeid(*inside) == typeid(Multiplication)) {
 		// Casting inside to multiplication
 		Multiplication* m = (Multiplication*) inside;
 
