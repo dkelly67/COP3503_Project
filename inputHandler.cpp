@@ -30,8 +30,6 @@ Number* InputHandler::parseString(string str){
 	addParenthesis(str, '*', '/');
 	addParenthesis(str, ':', 0);
 
-	cout << str << endl;
-
 	ans = parseString(str, 0, str.length());
 
 
@@ -143,7 +141,7 @@ void InputHandler::addMultiplication(string& str){
 	for(int i = 0; i < str.length(); i++){
 		if(str.at(i) == '('){
 			for(int j = i-1; j >= 0; j--){
-				if(isOperator(str.at(j)) || str.at(j) == ':')
+				if(isOperator(str.at(j)) || str.at(j) == ':' || str.at(j) == '(')
 					break;
 				else if(str.at(j) != ' '){
 					str.insert(j+1, "*");
@@ -154,9 +152,7 @@ void InputHandler::addMultiplication(string& str){
 		}
 		if(str.at(i) == ')'){
 			for(int j = i+1; j < str.length(); j++){
-				if(isOperator(str.at(j)))
-					break;
-				if(str.at(i) == ')')
+				if(isOperator(str.at(j)) || str.at(j) == ')')
 					break;
 				else if(str.at(j) != ' '){
 					str.insert(j, "*");

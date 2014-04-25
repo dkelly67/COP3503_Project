@@ -35,9 +35,17 @@ Number* Root::calculate() {
 	inside = inside->calculate();
 
 	// Necessary checks
-	if (inside->getDecimal() < 0 && root % 2 == 0) {
-		throw out_of_range("The inside of a square root must be positive");
+	if (inside->getDecimal() < 0){
+		if(root % 2 == 0)
+			throw out_of_range("The inside of a square root must be positive");
+		else{
+			Root* r = new Root(new Multiplication(inside, new Integer(-1)), root);
+			Multiplication* m = new Multiplication(new Integer(-1), r);
+			return m->calculate();
+		}
 	}
+
+
 	if (root < 0) {
 		// Make an integer of 1 for the numerator
 		Integer* newNum = new Integer(1);
@@ -61,13 +69,18 @@ Number* Root::calculate() {
 
 	//////////////////////////////////////////////////////////////////////////
 	if (typeid(*inside) == typeid(Integer)) {
-
+		bool isNeg = false;
 		// Cast 'inside' to actually be an integer
 		Integer* i = (Integer*) inside;
 
 		// Check if 'inside' is one, if so return one
-		if (i->getInteger() == 1) {
+		if (i->getInteger() == 1 || i->getInteger() == 0) {
 			return i;
+		}
+
+		if(i->getInteger() < 0){
+			i = new Integer(i->getInteger()*-1);
+			isNeg = true;
 		}
 
 		// Creating a new vector v and then using it in getFactors()
@@ -80,7 +93,7 @@ Number* Root::calculate() {
 		int current = 0; // Variable we're looking for
 		int outside = 1; // Outside of square root has 1
 
-		for (unsigned int i = 0; i <= v.size(); i++) {
+		for (unsigned int i = 0; i < v.size(); i++) {
 			if (current != v[i]) {
 				current = v[i];
 				count = 1;
@@ -94,6 +107,8 @@ Number* Root::calculate() {
 			}
 		}
 
+		if(isNeg)
+			outside *= -1;
 
 		// (outside)^root;
 		int answer = 1;
