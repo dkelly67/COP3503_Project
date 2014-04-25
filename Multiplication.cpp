@@ -66,7 +66,9 @@ string Multiplication::getString() {
 Number* Multiplication::calculate()
 {
 
+
 	//If one term
+
 
 	if (numOfTerms == 1)
 		return this->terms[0]->calculate();
@@ -76,7 +78,6 @@ Number* Multiplication::calculate()
 	for (int i = 0; i < this->numOfTerms; i++){
 
 			if(typeid(*terms[i]) == typeid(*this)){
-
 				Multiplication* s = (Multiplication*)(terms[i]);
 				Number** someTerms = s->getTerms();
 				int size = numOfTerms + s->getSize() -1;
@@ -104,30 +105,11 @@ Number* Multiplication::calculate()
 	for (int i = 0; i < this->numOfTerms; i++)
 	{
 		terms[i] = terms[i]->calculate();
+
 	}
 
 
 	for (int i = 0; i < this->numOfTerms; i++){
-		if(typeid(*terms[i]) == typeid(Integer)){
-			if(((Integer*)terms[i])->getInteger() == 0)
-				return new Integer(0);
-			if(((Integer*)terms[i])->getInteger() == 1){
-				Number** newTerms = new Number*[numOfTerms-1];
-				int k = 0;
-				for(int j = 0; j < numOfTerms; j++){
-					if(j != i){
-						newTerms[k] = terms[j];
-						k++;
-					}
-				}
-				terms = newTerms;
-				numOfTerms--;
-				i--;
-				continue;
-			}
-
-		}
-
 
 
 		for (int j = i + 1; j < this->numOfTerms; j++){
@@ -170,6 +152,7 @@ Number* Multiplication::calculate()
 
 				//If the roots are the same multiply the insides
 
+
 				Root* r1 = (Root*) terms[i];
 				Root* r2 = (Root*) terms[j];
 				if(r1->getRoot() == r2->getRoot()){
@@ -179,11 +162,11 @@ Number* Multiplication::calculate()
 				}
 			}
 
-			if(terms[i]->equals(terms[j])){
+
+			if(terms[i]->equals(terms[j]) && typeid(*terms[i]) != typeid(Summation)&& typeid(*terms[i]) != typeid(Multiplication)){
 				Number* product = new Exponent(terms[i], new Integer(2));
 				return recursiveStep(product, i, j);
 			}
-
 
 			//Exponent
 
@@ -212,6 +195,7 @@ Number* Multiplication::calculate()
 
 			//Summation
 
+
 			if(typeid(*terms[i]) == typeid(Summation) || typeid(*terms[j]) == typeid(Summation)){
 				//Distributive Property
 
@@ -227,6 +211,7 @@ Number* Multiplication::calculate()
 				else{
 					terms1 = ((Summation*)terms[i])->getTerms();
 					size1 =  ((Summation*)terms[i])->getSize();
+
 				}
 				if(typeid(*terms[j]) != typeid(Summation)){
 					terms2 = &terms[j];
@@ -236,15 +221,44 @@ Number* Multiplication::calculate()
 					terms2 = ((Summation*)terms[j])->getTerms();
 					size2 =  ((Summation*)terms[j])->getSize();
 				}
+
 				Summation* result = new Summation(new Integer(0), new Integer(0));
+
 				for(int k = 0; k < size1; k++){
 					for(int l = 0; l < size2; l++){
 						Multiplication* m = new Multiplication(terms1[k], terms2[l]);
 						result = new Summation(result, m);
 					}
 				}
+
+
 				return recursiveStep(result, i, j);
 			}
+
+
+
+			if(typeid(*terms[i]) == typeid(Integer)){
+				if(((Integer*)terms[i])->getInteger() == 0)
+					return new Integer(0);
+				if(((Integer*)terms[i])->getInteger() == 1){
+					Number** newTerms = new Number*[numOfTerms-1];
+					int k = 0;
+					for(int j = 0; j < numOfTerms; j++){
+						if(j != i){
+							newTerms[k] = terms[j];
+							k++;
+						}
+					}
+					terms = newTerms;
+					numOfTerms--;
+					i--;
+					continue;
+				}
+
+			}
+
+
+
 		}
 	}
 

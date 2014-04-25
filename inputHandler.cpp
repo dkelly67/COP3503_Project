@@ -1,25 +1,4 @@
-/*
- * InputHandler.cpp
- *
- *  Created on: Apr 17, 2014
- *      Author: Jackson
- */
-
 #include "InputHandler.h"
-
-#include <sstream>
-#include <stdexcept>
-
-#include "Constant.h"
-#include "Exponent.h"
-#include "Fraction.h"
-#include "Multiplication.h"
-#include "Summation.h"
-
-class Logarithm;
-class Root;
-
-
 
 
 InputHandler::InputHandler() {
@@ -27,10 +6,6 @@ InputHandler::InputHandler() {
 }
 
 Number* InputHandler::parseString(string str){
-
-	if(str == "")
-		throw out_of_range("Empty String");
-
 
 	checkFormat(str);
 
@@ -56,35 +31,98 @@ Number* InputHandler::parseString(string str){
 
 
 	ans = parseString(str, 0, str.length());
+
+
 	return ans;
 }
-
 
 bool InputHandler::checkFormat(string str){
 
 	int counter = 0;
 	bool lastOperator = false;
-	for(int i = 0; i < str.length(); i++){
+
+    // Beginning of For Loop //////////////////////////////////////////////////////////
+    for (int i = 0; i < str.length(); i++){
 		char c = str.at(i);
 
 		//Parenthesis
-		if(c == '(')
+		if(c == '(') {
 			counter++;
+            continue;
+        }
 		if(c == ')'){
 			if(lastOperator)
 				throw out_of_range("Trailing operator within parenthesized expression");
 			counter--;
+            continue;
 		}
 
 		//Operators
 		if(isOperator(c)){
-			if(lastOperator && c != '-')
+			if(lastOperator && c != '-') {
 				throw out_of_range("Subsequent operators not allowed");
+            }
 			lastOperator = true;
+            continue;
 		}
-		else if(c != ' ')
+		else if(c != ' ') {
 			lastOperator = false;
-	}
+        }
+
+        // Int
+        if (isInt(c)) {
+            continue;
+        }
+
+        // Space
+        if (str.substr(i, 1) == " ") {
+            continue;
+        }
+
+        // Colon
+        if (str.substr(i, 1) == ":") {
+            continue;
+        }
+
+        // Constants
+        if (str.substr(i, 1) == "e") {
+            continue;
+        }
+        if (str.substr(i, 2) == "pi") {
+            i++;
+            continue;
+        }
+
+        // Ans
+        if (str.substr(i, 3) == "ans") {
+            i += 2;
+            continue;
+        }
+
+        // Log
+        if (str.substr(i, 4) == "log_") {
+            i += 3;
+            continue;
+        }
+
+        // Root
+        if (str.substr(i, 4) == "sqrt") {
+            i += 3;
+            continue;
+        }
+        if (str.substr(i, 2) == "rt") {
+            i++;
+            continue;
+        }
+
+        // If we get all the way down here
+        stringstream ss;
+        ss << c << " is not a token.\n";
+        throw out_of_range(ss.str());
+
+
+	} // End of For Loop /////////////////////////////////////////////////////////////
+
 
 	if(counter != 0)
 		throw out_of_range("Improper use of parenthesis");
@@ -93,10 +131,8 @@ bool InputHandler::checkFormat(string str){
 		throw out_of_range("Trailing Operator");
 
 
-
 	return true;
 }
-
 
 void InputHandler::addMultiplication(string& str){
 	for(int i = 0; i < str.length(); i++){
@@ -114,6 +150,8 @@ void InputHandler::addMultiplication(string& str){
 		if(str.at(i) == ')'){
 			for(int j = i+1; j < str.length(); j++){
 				if(isOperator(str.at(j)))
+					break;
+				if(str.at(i) == ')')
 					break;
 				else if(str.at(j) != ' '){
 					str.insert(j, "*");
@@ -133,6 +171,7 @@ void InputHandler::addParenthesis(string& str, char op1, char op2){
 	for(int i = 0; i < str.length(); i++){
 		if(str.at(i) == op1 || str.at(i) == op2){
 			//Left
+			bool added = false;
 			counter = 0;
 			for(int j = i-1; j >=0; j--){
 				if(str.at(j) == ')')
@@ -141,9 +180,10 @@ void InputHandler::addParenthesis(string& str, char op1, char op2){
 					counter--;
 				if(counter == -1)
 					break;
-				else if(isOperator(str.at(j)) && counter == 0){
+				else if((isOperator(str.at(j)) || (str.at(j) == ':' && op1 == '^')) && counter == 0){
 					str.insert(j+1, "(");
 					i++;
+					added = true;
 					break;
 				}
 				if(j == 0){
@@ -160,8 +200,11 @@ void InputHandler::addParenthesis(string& str, char op1, char op2){
 					counter++;
 				else if(str.at(j) == ')')
 					counter--;
-				if(counter == -1)
+				if(counter == -1){
+					if(added)
+						str.insert(j, ")");
 					break;
+				}
 				else if(isOperator(str.at(j)) && counter == 0){
 					str.insert(j, ")");
 					break;
@@ -179,7 +222,8 @@ void InputHandler::addParenthesis(string& str, char op1, char op2){
 
 Number* InputHandler::parseString(string str, int start, int end){
 
-	Number* num;
+
+	Number* num = new Integer(0);
 	Number* newNum;
 	int j = 1;
 	char op = ' ';
@@ -234,9 +278,8 @@ Number* InputHandler::parseParenthesis(string str, int start, int& j){
 		if(counter <= 0)
 			return parseString(str, start+1, i);
 	}
-	return NULL;
+    return NULL;
 }
-
 
 Number* InputHandler::readInteger(string str, int i, int& j){
 
@@ -341,6 +384,9 @@ Number* InputHandler::readNumber(string str, int i, int& j){
 
 	//ans
 	if(str.substr(i, 3) == "ans"){
+        if (newNum == NULL) {
+            throw out_of_range("There has not been a previous answer to use.");
+        }
 		newNum = ans;
 		j = 3;
 	}

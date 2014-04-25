@@ -1,19 +1,21 @@
 //============================================================================
+// Author      : Ross Castillo
 // Created on  : 04.12.14
 // File        : Logarithm.cpp
 // Description : This class will represent the log function of a calculator.
 //============================================================================
 
-#include "Root.h"
-#include "Integer.h"
-#include "Exponent.h"
-#include "Summation.h"
 #include "Logarithm.h"
-#include "Multiplication.h"
-
 #include <sstream>
 #include <math.h>
 #include <typeinfo>
+#include "Integer.h"
+#include "Summation.h"
+#include "Multiplication.h"
+#include "Exponent.h"
+#include "Root.h"
+
+using namespace std;
 
 Logarithm::Logarithm(Number* base, Number* arg) {
 	this->base = base;
@@ -91,15 +93,15 @@ Number* Logarithm::calculate() {
 
 	}
 
-	if(typeid(arg) == typeid(Exponent)){
+	if(typeid(*arg) == typeid(Exponent)){
 
 		Exponent* exp = (Exponent*)arg;
 
-		if(base == exp->getInside())
+		if(base->equals(exp->getInside()))
 			return exp->getPower();
 		else{
 
-		Multiplication* m = new Multiplication(exp->getPower(), exp->getInside());
+		Multiplication* m = new Multiplication(exp->getPower(), new Logarithm(base, exp->getInside()));
 
 		return m->calculate();
 		}
@@ -139,8 +141,13 @@ double Logarithm::getDecimal() {
 
 
 bool Logarithm::equals(Number* number){
-	if(typeid(number) != typeid(Logarithm))
+
+	if(number == NULL)
 		return false;
+
+	if(typeid(*number) != typeid(Logarithm))
+		return false;
+
 
 	Logarithm* l = (Logarithm*)number;
 
@@ -152,3 +159,8 @@ Logarithm::~Logarithm() {
 	delete base;
 	delete arg;
 }
+
+
+
+
+

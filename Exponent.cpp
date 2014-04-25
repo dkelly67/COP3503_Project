@@ -1,16 +1,23 @@
-#include "Root.h"
+/*
+ * Exponent.cpp
+ *
+ *  Created on: Apr 13, 2014
+ *      Author: Jackson
+ */
+
+#include "Exponent.h"
+#include <sstream>
+#include <typeinfo>
 #include "Integer.h"
 #include "Fraction.h"
 #include "Constant.h"
-#include "Exponent.h"
-#include "Summation.h"
-#include "Multiplication.h"
-
-#include <math.h>
-#include <sstream>
 #include <iostream>
-#include <typeinfo>
+#include "Multiplication.h"
+#include "Root.h"
+#include "Summation.h"
+#include <math.h>
 
+using namespace std;
 
 Exponent::Exponent(Number* inside, Number* power){
 	this->inside = inside;
@@ -24,15 +31,27 @@ Number* Exponent::calculate(){
 	power = power->calculate();
 
 	if(typeid(*inside) == typeid(Integer) && typeid(*power) == typeid(Integer)){
+		if(power->getDecimal() > 0){
 		Number* ans = new Integer(this->getDecimal());
-		delete this;
 		return ans;
+		}
+		else{
+			Fraction* f = new Fraction(new Integer(1), this);
+			return new Fraction(new Integer(1), new Integer(f->getDecimal()));
+		}
+	}
+
+	if(power->getDecimal() < 0){
+		Fraction* f = new Fraction(new Integer(1), new Exponent(inside, new Multiplication(new Integer(-1), power)));
+		return f->calculate();
 	}
 
 	if(typeid(*power) == typeid(Integer)){
 
+
 		Integer* pow = (Integer*) power;
 		int p = pow->getInteger();
+
 
 		if(p == 0){
 			delete this;
@@ -41,11 +60,6 @@ Number* Exponent::calculate(){
 		if(p == 1)
 			return inside;
 
-		if(p< 0){
-			Fraction* f = new Fraction(new Integer(1), new Exponent(inside, new Integer(-p)));
-			delete this;
-			return f->calculate();
-		}
 
 
 		if(typeid(*inside) == typeid(Fraction)){
@@ -168,6 +182,11 @@ string Exponent::getString(){
 }
 bool Exponent::equals(Number* number){
 
+
+	if(number == NULL)
+		return false;
+
+
 	if(typeid(*number) != typeid(Exponent))
 		return false;
 
@@ -194,3 +213,5 @@ Exponent::~Exponent(){
 	delete inside;
 	delete power;
 }
+
+

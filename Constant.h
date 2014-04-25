@@ -1,36 +1,37 @@
-//============================================================================
-// Created on  : 04.06.14
-// File        : Constant.h
-// Description : This class will represent the two constants, pi and e.
-//============================================================================
+/*
+ * Constant.h
+ *
+ *  Created on: Apr 6, 2014
+ *      Author: Jackson
+ */
 
 #ifndef CONSTANT_H_
 #define CONSTANT_H_
-#include "Number.h"
-using namespace std;
 
-class Constant : public Number {
+#include "Number.h";
+
+
+class Constant : public Number{
 public:
-	// Initialization Constructor
-	Constant(bool isPi, bool isE);
 
-	// Virtual functions from Number.h
+	Constant(bool isPi, bool isE);
+	virtual ~Constant();
+
 	virtual Number* calculate();
 	virtual string getString();
 	virtual double getDecimal();
 	virtual bool equals(Number* number);
 
-	// Class functions
 	bool IsPi();
 	bool IsE();
 
-	// Destructor
-	virtual ~Constant();
-
 private:
-	// Private variables
 	bool pi;
 	bool e;
 };
+
+
+
+
 
 #endif /* CONSTANT_H_ */

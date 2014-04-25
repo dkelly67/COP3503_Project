@@ -102,17 +102,17 @@ Number* Root::calculate() {
 		}
 
 		int in = i->getInteger()/answer;
-		if(in != 1){
-			Root* r = new Root((new Integer(i->getInteger()/answer)), root);
 
-			Number** terms = new Number*[2];
-			terms[0] = new Integer(outside);
-			terms[1] = r;
-
-			return new Multiplication(terms, 2);
+		if(outside != 1){
+			if(in != 1){
+				Root* r = new Root((new Integer(in)), root);
+				return new Multiplication(new Integer(outside), r);
+			}
+			else
+				return new Integer(outside);
 		}
 		else
-			return new Integer(outside);
+			return this;
 	}
 	//////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////

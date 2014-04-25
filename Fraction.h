@@ -1,3 +1,10 @@
+/*
+ * Fraction.h
+ *
+ *  Created on: Apr 11, 2014
+ *      Author: Jackson
+ */
+
 #ifndef FRACTION_H_
 #define FRACTION_H_
 
@@ -26,8 +33,8 @@ private:
 	Number* num;
 	Number* den;
 
-	void reduceInts(Integer& n, Integer& d);
-	void reduceNumbers(Number** n, Number** d);
+	bool reduceInts(Integer& n, Integer& d);
+	bool reduceNumbers(Number** n, Number** d);
 };
 
 

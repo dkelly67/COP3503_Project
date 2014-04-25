@@ -1,21 +1,21 @@
-/*
- * InputHandler.h
- *
- *  Created on: Apr 17, 2014
- *      Author: Jackson
- */
-
 #ifndef INPUTHANDLER_H_
 #define INPUTHANDLER_H_
 
-#include <string>
-
-#include "Integer.h"
-#include "Number.h"
 #include "Root.h"
+#include "Number.h"
+#include "Integer.h"
+#include "Fraction.h"
+#include "Exponent.h"
+#include "Constant.h"
+#include "Summation.h"
 #include "Logarithm.h"
+#include "Multiplication.h"
 
+#include <string>
+#include <sstream>
+#include <stdexcept>
 
+using namespace std;
 
 class InputHandler {
 public:

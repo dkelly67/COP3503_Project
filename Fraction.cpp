@@ -1,16 +1,19 @@
-#include "Root.h"
-#include "Integer.h"
-#include "Fraction.h"
-#include "Exponent.h"
-#include "Constant.h"
-#include "Summation.h"
-#include "Logarithm.h"
-#include "Multiplication.h"
 
-#include <vector>
+
 #include <sstream>
 #include <typeinfo>
 #include <iostream>
+#include "Fraction.h"
+#include "Integer.h"
+#include "Constant.h"
+#include <vector>
+#include "Multiplication.h"
+#include "Root.h"
+#include "Exponent.h"
+#include "Summation.h"
+#include "Logarithm.h"
+
+using namespace std;
 
 Fraction::Fraction(Number* num, Number* den){
 	this->num = num;
@@ -20,34 +23,47 @@ Fraction::Fraction(Number* num, Number* den){
 
 Number* Fraction::calculate(){
 
-	if(num->equals(den))
-		return new Integer(1);
-
 
 	num = num->calculate();
 	den = den->calculate();
 
 
+	// 0
 
-	if(typeid(*num) == typeid(Integer)){
+	if(typeid(*num) == typeid(Integer))
 		if(((Integer*)num)->getInteger() == 0)
 			return new Integer(0);
+
+	//1
+
+	if(num->equals(den))
+		return new Integer(1);
+
+
+	//Try to reduce
+
+
+	if(reduceNumbers(&num, &den)){
+		return calculate();
 	}
+
 
 	//Root
 
 	if(typeid(*den) == typeid(Root)){
+
+		cout << "Here" << endl;
 		Root* r = (Root*)den;
 
-		Number** terms = new Number*[2];
-		terms[0] = num;
-		terms[1] = new Exponent(r, new Integer(r->getRoot()-1));
-
-		num = new Multiplication(terms, 2);
+		num = new Multiplication(num, new Exponent(r, new Integer(r->getRoot()-1)));
 		den = r->getInside();
+
+		cout << num->getString() << endl;
 
 		return calculate();
 	}
+
+	//Conjugate
 
 	if(typeid(*den) == typeid(Summation)){
 		Summation* s = (Summation*)den;
@@ -85,10 +101,7 @@ Number* Fraction::calculate(){
 			}
 
 			if(root != NULL){
-				Number** theTerms = new Number*[2];
-				theTerms[0] = root;
-				theTerms[1] = nonRoot;
-				Summation* conjucate = new Summation(theTerms, 2);
+				Summation* conjucate = new Summation(root, nonRoot);
 				Multiplication* n = new Multiplication(num, conjucate);
 				Multiplication* d = new Multiplication(den, conjucate);
 				Fraction* f = new Fraction(n,d);
@@ -103,72 +116,41 @@ Number* Fraction::calculate(){
 
 	if(typeid(*num) == typeid(Fraction)){
 		Fraction* f = (Fraction*)num;
-		Number** numTerms = new Number*[2];
-		Number** denTerms = new Number*[2];
-
-		numTerms[0] = num;
-		numTerms[1] = f->getDenominator();
-
-		denTerms[0] = den;
-		denTerms[1] = f->getDenominator();
-
-		num = new Multiplication(numTerms, 2);
-		den = new Multiplication(denTerms, 2);
+		num = new Multiplication(num, f->getDenominator());
+		den = new Multiplication(den, f->getDenominator());
 		return calculate();
 	}
-
 
 	if(typeid(*den) == typeid(Fraction)){
 		Fraction* f = (Fraction*)den;
-
-		Number** numTerms = new Number*[2];
-		Number** denTerms = new Number*[2];
-
-		numTerms[0] = num;
-		numTerms[1] = f->getDenominator();
-
-		denTerms[0] = den;
-		denTerms[1] = f->getDenominator();
-
-		num = new Multiplication(numTerms, 2);
-		den = new Multiplication(denTerms, 2);
+		num = new Multiplication(num, f->getDenominator());
+		den = new Multiplication(den, f->getDenominator());
 		return calculate();
 	}
 
 
+	//Logs
 
+	if(typeid(*num) == typeid(Logarithm) && typeid(*den) == typeid(Logarithm)){
+		Logarithm* n = (Logarithm*)num;
+		Logarithm* d = (Logarithm*)den;
 
-	//Ints
+		if(n->getBase()->equals(d->getBase())){
+			Logarithm* log = new Logarithm(d->getArg(), n->getArg());
+			return log->calculate();
+		}
 
-	if(typeid(*num) == typeid(Integer) && typeid(*den) == typeid(Integer)){
-
-		//Reduce integers
-
-		Integer* n = (Integer*) num;
-		Integer* d = (Integer*) den;
-
-		reduceInts(*n, *d);
-
-		//delete this;
-
-		if(d->getInteger() != 1)
-			return new Fraction(n, d);
-		else return new Integer(n->getInteger());
 	}
 
 
 
-	//Exponents
 
-	Number** nP = &num;
-	Number** dP = &den;
-	reduceNumbers(nP, dP);
-	num = *nP;
-	den = *dP;
 
 	//Multiplication
 
+
 	if(typeid(*num) == typeid(Multiplication) || typeid(*den) == typeid(Multiplication)){
+
 
 	Number** numTerms;
 	Number** denTerms;
@@ -192,62 +174,59 @@ Number* Fraction::calculate(){
 
 	for(int i = 0 ; i < numSize; i++){
 		for(int j = 0; j < denSize; j++){
-
-			Number** nP = &numTerms[i];
-			Number** dP = &denTerms[j];
-			reduceNumbers(nP, dP);
-			numTerms[i] = *nP;
-			denTerms[i] = *dP;
-
+			reduceNumbers(&numTerms[i], &denTerms[j]);
 		}
 	}
 
 	num = num->calculate();
 	den = den->calculate();
+	}
 
-	if(num->equals(den)){
-		delete this;
+
+
+
+
+	//Check one last time for special cases
+
+	// 0
+
+	if(typeid(*num) == typeid(Integer))
+		if(((Integer*)num)->getInteger() == 0)
+			return new Integer(0);
+
+	//1
+
+	if(num->equals(den))
 		return new Integer(1);
-	}
-
-	if(typeid(*den) == typeid(Integer)){
-		if(((Integer*) den)->getInteger() == 1)
-			return num;
-	}
-
-	return this;
-	}
 
 
-	if(typeid(*num) == typeid(Logarithm) && typeid(*den) == typeid(Logarithm)){
-		Logarithm* n = (Logarithm*)num;
-		Logarithm* d = (Logarithm*)den;
+	//den = 1
 
-		if(n->getBase()->equals(d->getBase())){
-			Logarithm* log = new Logarithm(d->getArg(), n->getArg());
-			return log->calculate();
-		}
+	if(typeid(*den) == typeid(Integer))
+			if(((Integer*)den)->getInteger() == 1)
+				return num->calculate();
 
-	}
+
+
 
 	return this;
 }
 
 
-void Fraction::reduceInts(Integer& n, Integer& d){
+bool Fraction::reduceInts(Integer& n, Integer& d){
+
+	bool changed = false;;
 
 	vector<int> nFactors = n.getFactors();
 
 	vector<int> dFactors = d.getFactors();
-
-	//TODO: Really hacky way of doing this
-
 
 	for(int i = 0; i < nFactors.size(); i++){
 		for(int j = 0; j < dFactors.size(); j++){
 			if(nFactors[i] == dFactors[j]){
 				nFactors[i] = 4;
 				dFactors[j] = 4;
+				changed = true;
 			}
 		}
 	}
@@ -269,10 +248,13 @@ void Fraction::reduceInts(Integer& n, Integer& d){
 	n = Integer(numValue);
 	d = Integer(denValue);
 
+	return changed;
 }
 
 
-void Fraction::reduceNumbers(Number** nP, Number** dP){
+bool Fraction::reduceNumbers(Number** nP, Number** dP){
+
+
 
 	Number* n = *nP;
 	Number* d = *dP;
@@ -280,15 +262,19 @@ void Fraction::reduceNumbers(Number** nP, Number** dP){
 	//Same:
 
 	if(n->equals(d)){
-		*n = Integer(1);
-		*d = Integer(1);
+		n = new Integer(1);
+		d = new Integer(1);
+		*nP = n;
+		*dP = d;
+		return true;
 	}
 
 	//Int:
 
-	if(typeid(*n) == typeid(Integer) && typeid(*d) == typeid(Integer())){
+	if(typeid(*n) == typeid(Integer) && typeid(*d) == typeid(Integer)){
 
-		reduceInts(*(Integer*)n, *(Integer*)d);
+		if(reduceInts(*(Integer*)n, *(Integer*)d))
+			return true;
 
 	}
 
@@ -317,16 +303,18 @@ void Fraction::reduceNumbers(Number** nP, Number** dP){
 			terms[1] = mult;
 			Summation* p = new Summation(terms, 2);
 			n1 = new Exponent(n1->getInside(), p);
+			n = n1;
+			d = new Integer(1);
+
+			*nP = n;
+			*dP = d;
+			return true;
 		}
 
-		n = n1;
-		d = new Integer(1);
 
-		*nP = n;
-		*dP = d;
 	}
 
-
+	return false;
 
 }
 
@@ -380,6 +368,9 @@ string Fraction::getString(){
 
 
 bool Fraction::equals(Number* number){
+
+	if(number == NULL)
+		return false;
 
 	if(typeid(*number) != typeid(Fraction))
 		return false;

@@ -81,8 +81,15 @@ bool Summation::equals(Number* number)
 		return false;
 
 
-	Number** terms1 = terms;
-	Number** terms2 = m->terms;
+
+	Number** terms1 = new Number*[numOfTerms];
+	for(int a = 0; a < numOfTerms; a++)
+		terms1[a] =  terms[a];
+
+	Number** terms2 = new Number*[m->numOfTerms];
+	for(int a = 0; a < m->numOfTerms; a++)
+		terms2[a] =  m->terms[a];
+
 
 	int counter = 0;
 
@@ -311,13 +318,16 @@ Number* Summation::calculate()
 					return recursiveStep(sum, i, j);
 
 				}
-
-
 			}
+
+
+			//TODO: Fractions
 
 
 		}
 	}
+
+
 
 
 	//TODO: Simplify
