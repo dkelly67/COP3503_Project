@@ -1,6 +1,6 @@
 /**************************************************
 Created by: Jackson Benfer,Daniel Kelly, Ross Castillo, Michael Ton, Alexa Chasar
-Assignment: COP3503 Calculator Project
+Assignment: COP3503 Symbolic Calculator Project
 *****************************************************/
 
 #include "Number.h"
@@ -16,15 +16,17 @@ Assignment: COP3503 Calculator Project
 
 using namespace std;
 
-vector<Number*> prevAns;
-Number* ansKeyword;
-InputHandler in;
+//Global variables
+vector<Number*> prevAns; //Stores previous answers. Used for "Reviewing" them later
+//Number* ansKeyword; //
+InputHandler in; //Inputhandler object that is used for taking in inputs and processing them
 
+//Compute New Expression
 void compNewExpression()
 {
 	string input;
 	char direction;
-
+	//Keeps asking for new inpu expression until user specifies 'q' meaning quit. User then returns back to original menu
 	while (true)
 	{
 
@@ -32,30 +34,32 @@ void compNewExpression()
 		cout << "Enter expression: ";
 
 		cin >> input;
-		if (input == "q")
+		if (input == "q")	//If input is 'q' then function breaks and user returns to menu
 		{
 			cout << "Returning to menu" << endl;
 			break;
 		}
-		Number *tempAns = in.parseString(input);
+		Number *tempAns = in.parseString(input); //parses input string ussing inputHandler object global variable
 
-		Number *answer = tempAns->calculate();
+		Number *answer = tempAns->calculate(); //Calculates parsed input string
 
-		prevAns.push_back(answer);
+		prevAns.push_back(answer); //Adds this answer to the dynamic list of previous answers.
 
-		cout << "Answer: " << answer->getString() << endl;
+		cout << "Answer: " << answer->getString() << endl; //Output
 	}
 }
 
+//HELP menu. Provides information on different functions and how to input
 void help()
 {
-	char choice;
+	char choice; 
+	//loops through help menu until user decides to exit, in which case the user returns to the main menu
 	while (true)
 	{
 		cout << "HELP MENU" << endl << "Choose what you need help with from the options below: " << endl;
-		cout << "(a) What does 'Compute new expression' do?" << endl << "(b) What does the 'Review' function do?" << endl << "(c) How do I input an expression?" << endl << "(d) How do I input constants?" << endl << "(e) How do I input exponents?" << endl << "(f) How do I input logarithms?" << endl << "(g) How do I input roots?" << endl << "(h) How do I input fractions?" << endl;
+		cout << "(a) What does 'Compute new expression' do?" << endl << "(b) What does the 'Review' function do?" << endl << "(c) How do I enter an expression?" << endl << "(d) How do I enter constants?" << endl << "(e) How do I enter exponents?" << endl << "(f) How do I enter logarithms?" << endl << "(g) How do I enter roots?" << endl << "(h) How do I enter fractions?" << endl;
 		cin >> choice;
-
+		//Based on choice, displays appropriate output
 		switch (choice)
 		{
 		case 'a':
@@ -74,10 +78,10 @@ void help()
 			cout << "The only supported constants are 'pi' and 'e'. Simply enter 'pi' for PI and 'e' for the exponential constant." << endl;
 			break;
 		case 'e':
-			cout << "Input exponents like so: Base^Power, in which 'Base' is a number and 'Power' is a number." << endl;
+			cout << "Enter exponents like so: Base^Power, in which 'Base' is a number and 'Power' is a number." << endl;
 			break;
 		case 'f':
-			cout << "Input logarithms like so: 'log_Base:Arg', where 'Base' is the base of the logarithm and 'Arg' is the argument of the logarithm." << endl;
+			cout << "Enter logarithms like so: 'log_Base:Arg', where 'Base' is the base of the logarithm and 'Arg' is the argument of the logarithm." << endl;
 			break;
 		case 'g':
 			cout << "To enter a square root: 'sqrt:arg', in which 'arg' is the number that you are taking a square root of." << endl
@@ -88,7 +92,7 @@ void help()
 			break;
 		case 'q':
 			cout << "Back to menu" << endl;
-			return;
+			return; //Returns to main menu
 		default:
 			cout << "Not a help menu option. Please choose a valid help menu option." << endl;
 			break;
@@ -96,19 +100,21 @@ void help()
 	}
 }
 
+//Function which allows user to set 'ans' keyword and review previous answers to previously entered expressions.
 void Review()
 {	
 	int i = 0;
-	char rev;
+	char choice;
 	int ansNumber;
+	//Loops through choices in the Review menu, until user specifies a quit command, in which the user returns to the main menu
 	while (true)
 	{
 		cout << "Choose an option below: " << endl;
 
 		cout << "(a) Show decimal form of the previous expression's answer" << endl << "(b) Set the ans keyword to one of the previous expression's answer." << endl;
 
-		cin >> rev;
-		switch (rev)
+		cin >> choice;
+		switch (choice)
 		{
 		case 'a':
 			cout << "Which answer do you want to see?";
@@ -143,20 +149,22 @@ void Review()
 			break;
 		case 'q':
 			cout << "Returning to menu" << endl;
-			return;
+			return; //Return to main menu
 		default:
 			cout << "Please choose a valid option";
 			break;
 		}
 	}
 }
+//Main menu. Displays options for the user to execute. Options are, computing a new expression, help menu, and reviewing previous answers
 void menu(void)
 {
+	//Loops through choices until user specifies quit command, in which the program exits
 	while (true)
 	{
 		cout << "Hello! Please choose an option below." << endl;
 
-		cout << "(a) Computer new expression" << endl << "(b) Help" << endl << "(c) Review previous expressions and answers" << endl << "(d) Quit" << endl;
+		cout << "(a) Compute new expression" << endl << "(b) Help" << endl << "(c) Review previous expressions and answers" << endl << "(d) Quit" << endl;
 
 		char choice;
 
@@ -195,12 +203,13 @@ void menu(void)
 			cout << "Quitting..." << endl;
 			return;
 		default:
-			cout << "DUMBASS" << endl;
+			cout << "Not a valid option. Please use a valid option." << endl;
 			break;
 		}
 	}
 }
 
+//Main function
 int main(void)
 {	
 
