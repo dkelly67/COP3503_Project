@@ -420,6 +420,10 @@ bool InputHandler::isOperator(char c){
 	return (c == '+' || c == '/' || c == '*' || c == '-' || c == '^');
 }
 
+void InputHandler::setAns(Number* ans){
+	this->ans = ans;
+}
+
 
 
 InputHandler::~InputHandler() {

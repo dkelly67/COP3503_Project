@@ -25,7 +25,7 @@ public:
 	InputHandler();
 	virtual ~InputHandler();
 
-
+	void setAns(Number* ans);
 
 private:
 
