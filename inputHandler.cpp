@@ -346,7 +346,7 @@ Number* InputHandler::readNumber(string str, int i, int& j){
 
 
 	char c = str.at(i);
-	Number* newNum;
+	Number* newNum = NULL;
 	j = 0;
 
 
@@ -420,7 +420,9 @@ bool InputHandler::isOperator(char c){
 	return (c == '+' || c == '/' || c == '*' || c == '-' || c == '^');
 }
 
-
+void InputHandler::setAns(Number* ans){
+	this->ans = ans;
+}
 
 InputHandler::~InputHandler() {
 }
