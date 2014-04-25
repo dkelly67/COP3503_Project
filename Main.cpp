@@ -18,12 +18,15 @@ using namespace std;
 
 //Global variables
 vector<Number*> prevAns; //Stores previous answers. Used for "Reviewing" them later
-//Number* ansKeyword; //
+
 InputHandler in; //Inputhandler object that is used for taking in inputs and processing them
 
 //Compute New Expression
 void compNewExpression()
 {
+	Number* tempAns = NULL;
+	Number *answer = NULL;
+	Number *answerNew = NULL;
 	string input;
 	char direction;
 	//Keeps asking for new inpu expression until user specifies 'q' meaning quit. User then returns back to original menu
@@ -39,13 +42,37 @@ void compNewExpression()
 			cout << "Returning to menu" << endl;
 			break;
 		}
-		Number *tempAns = in.parseString(input); //parses input string ussing inputHandler object global variable
+		try
+		{
+			tempAns = in.parseString(input); //parses input string using inputHandler object global variable
+		}
+		catch (exception e)
+		{
+			cout << e.what() << endl;
+			continue;
+		}
+		try
+		{
+			answer = tempAns->calculate(); //Calculates parsed input string
+		}
+		catch (exception e)
+		{
+			cout << e.what() << endl;
+			continue;
+		}
 
-		Number *answer = tempAns->calculate(); //Calculates parsed input string
+		try
+		{
+			answerNew = answer->calculate();
+		}
+		catch (exception e)
+		{
+			cout << e.what() << endl;
+			continue;
+		}
+		prevAns.push_back(answerNew); //Adds this answer to the dynamic list of previous answers.
 
-		prevAns.push_back(answer); //Adds this answer to the dynamic list of previous answers.
-
-		cout << "Answer: " << answer->getString() << endl; //Output
+		cout << "Answer: " << answerNew->getString() << endl; //Output
 	}
 }
 
@@ -163,6 +190,7 @@ void menu(void)
 	while (true)
 	{
 		cout << "Hello! Please choose an option below." << endl;
+		cout << "UNLESS OTHERWISE SPECIFIED, INPUT 'q' TO EXIT A MENU" << endl;
 
 		cout << "(a) Compute new expression" << endl << "(b) Help" << endl << "(c) Review previous expressions and answers" << endl << "(d) Quit" << endl;
 

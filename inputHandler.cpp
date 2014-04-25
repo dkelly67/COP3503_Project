@@ -405,7 +405,7 @@ Number* InputHandler::readNumber(string str, int i, int& j){
 
 
 	char c = str.at(i);
-	Number* newNum;
+	Number* newNum = new Integer(0);
 	j = 0;
 
 
