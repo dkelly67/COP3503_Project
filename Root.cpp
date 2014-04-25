@@ -35,7 +35,7 @@ Number* Root::calculate() {
 	inside = inside->calculate();
 
 	// Necessary checks
-	if (inside < 0) {
+	if (inside->getDecimal() < 0 && root % 2 == 0) {
 		throw out_of_range("The inside of a square root must be positive");
 	}
 	if (root < 0) {

@@ -28,7 +28,9 @@ Number* InputHandler::parseString(string str){
 	//Add implicit parenthesis (for pemdas)
 	addParenthesis(str, '^', 0);
 	addParenthesis(str, '*', '/');
+	addParenthesis(str, ':', 0);
 
+	cout << str << endl;
 
 	ans = parseString(str, 0, str.length());
 
@@ -134,6 +136,9 @@ bool InputHandler::checkFormat(string str){
 	return true;
 }
 
+
+
+
 void InputHandler::addMultiplication(string& str){
 	for(int i = 0; i < str.length(); i++){
 		if(str.at(i) == '('){
@@ -165,6 +170,63 @@ void InputHandler::addMultiplication(string& str){
 
 
 void InputHandler::addParenthesis(string& str, char op1, char op2){
+
+
+	if(op1 == ':'){
+
+		int counter = 0;
+
+		for(int i = 0; i < str.length(); i++){
+			if(str.at(i) == '-'){
+
+				//Left
+				bool added = false;
+				counter = 0;
+				for(int j = i-1; j >=0; j--){
+					if(str.at(j) == ':'){
+						added = true;
+						str.insert(j+1, "(");
+						break;
+					}
+
+					if(str.at(j) != ' ' ){
+						break;
+					}
+				}
+
+				//Right
+
+				if(added){
+				counter = 0;
+				for(int j = i+2; j < str.length(); j++){
+					if(str.at(j) == '(')
+						counter++;
+					else if(str.at(j) == ')')
+						counter--;
+					if(counter == -1){
+						if(added)
+							str.insert(j, ")");
+						break;
+					}
+					else if(isOperator(str.at(j)) && counter == 0 && str.at(j) != '^'){
+						str.insert(j, ")");
+						break;
+					}
+					if(j == str.length()-1){
+						str.append(")");
+						break;
+					}
+				}
+				}
+			}
+		}
+	}
+	else{
+
+
+
+
+
 
 	int counter = 0;
 
@@ -217,6 +279,7 @@ void InputHandler::addParenthesis(string& str, char op1, char op2){
 			}
 		}
 	}
+	}
 }
 
 
@@ -224,7 +287,7 @@ Number* InputHandler::parseString(string str, int start, int end){
 
 
 	Number* num = new Integer(0);
-	Number* newNum;
+	Number* newNum = NULL;
 	int j = 1;
 	char op = ' ';
 
